@@ -1083,8 +1083,9 @@ containing a value of this type.
         public static final int item_disabled=0x7f02005a;
         public static final int moon=0x7f02005b;
         public static final int sun=0x7f02005c;
-        public static final int temperature=0x7f02005d;
-        public static final int thermostatapp=0x7f02005e;
+        public static final int target=0x7f02005d;
+        public static final int temperature=0x7f02005e;
+        public static final int thermostatapp=0x7f02005f;
     }
     public static final class id {
         public static final int DayNightImage=0x7f05005c;

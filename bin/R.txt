@@ -240,8 +240,9 @@ int drawable icon 0x7f020059
 int drawable item_disabled 0x7f02005a
 int drawable moon 0x7f02005b
 int drawable sun 0x7f02005c
-int drawable temperature 0x7f02005d
-int drawable thermostatapp 0x7f02005e
+int drawable target 0x7f02005d
+int drawable temperature 0x7f02005e
+int drawable thermostatapp 0x7f02005f
 int id DayNightImage 0x7f05005c
 int id action_bar 0x7f05001c
 int id action_bar_activity_content 0x7f050015

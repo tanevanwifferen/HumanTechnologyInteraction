@@ -63,7 +63,7 @@
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/temperature" />
+            android:src="@drawable/target" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -110,7 +110,7 @@
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/temperature" />
+            android:src="@drawable/sun" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -157,7 +157,7 @@
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/temperature" />
+            android:src="@drawable/moon" />
 
         <TextView
             android:layout_width="wrap_content"
