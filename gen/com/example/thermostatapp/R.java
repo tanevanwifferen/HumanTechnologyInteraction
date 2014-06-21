@@ -1107,10 +1107,9 @@ containing a value of this type.
         public static final int beginning=0x7f050011;
         public static final int checkbox=0x7f05002d;
         public static final int collapseActionView=0x7f05000d;
-        public static final int current_Temperature_textView=0x7f05003e;
+        public static final int current_Temperature_textView=0x7f05003d;
         public static final int current_temperature_seekBar=0x7f050047;
         public static final int current_temperature_textView=0x7f050046;
-        public static final int currenttemperature=0x7f05003d;
         public static final int day_temperature_seekBar=0x7f050049;
         public static final int day_temperature_textView=0x7f050048;
         public static final int default_activity_button=0x7f050028;
@@ -1122,8 +1121,8 @@ containing a value of this type.
         public static final int expand_activities_button=0x7f050026;
         public static final int expanded_menu=0x7f05002c;
         public static final int friday_button=0x7f050054;
-        public static final int high_temperature_seekbar=0x7f050042;
-        public static final int high_temperature_textview=0x7f050041;
+        public static final int high_temperature_seekbar=0x7f050041;
+        public static final int high_temperature_textview=0x7f050040;
         public static final int home=0x7f050014;
         public static final int homeAsUp=0x7f050005;
         public static final int icon=0x7f05002a;
@@ -1132,8 +1131,8 @@ containing a value of this type.
         public static final int imageView1=0x7f050059;
         public static final int listMode=0x7f050001;
         public static final int list_item=0x7f050029;
-        public static final int low_temperature_seekbar=0x7f050044;
-        public static final int low_temperature_textview=0x7f050043;
+        public static final int low_temperature_seekbar=0x7f050043;
+        public static final int low_temperature_textview=0x7f050042;
         public static final int middle=0x7f050012;
         public static final int monday_button=0x7f050050;
         public static final int never=0x7f050009;
@@ -1167,10 +1166,10 @@ containing a value of this type.
         public static final int switchSwitch=0x7f05005d;
         public static final int switchThreeLayout=0x7f05005a;
         public static final int tabMode=0x7f050002;
-        public static final int target_temperature_seekbar=0x7f050040;
-        public static final int target_temperature_textview=0x7f05003f;
+        public static final int target_temperature_seekbar=0x7f05003f;
+        public static final int target_temperature_textview=0x7f05003e;
         public static final int thursday_button=0x7f050053;
-        public static final int timerIndicator=0x7f05005b;
+        public static final int timeButton=0x7f05005b;
         public static final int title=0x7f05002b;
         public static final int top_action_bar=0x7f050020;
         public static final int tuesday_button=0x7f050051;
@@ -1182,7 +1181,8 @@ containing a value of this type.
         public static final int vacation_mode_togglebutton=0x7f05004c;
         public static final int verticallayout=0x7f05003c;
         public static final int wednesday_button=0x7f050052;
-        public static final int weekProgramSwitch=0x7f050045;
+        public static final int weekProgramSwitch=0x7f050044;
+        public static final int weekprogram_button=0x7f050045;
         public static final int withText=0x7f05000c;
     }
     public static final class integer {
@@ -1236,13 +1236,12 @@ containing a value of this type.
         public static final int abc_search_view=0x7f030016;
         public static final int abc_simple_decor=0x7f030017;
         public static final int activity_home=0x7f030018;
-        public static final int activity_home2=0x7f030019;
-        public static final int activity_manage_thermostat=0x7f03001a;
-        public static final int activity_manage_weekprogram=0x7f03001b;
-        public static final int activity_overview=0x7f03001c;
-        public static final int activity_splash=0x7f03001d;
-        public static final int support_simple_spinner_dropdown_item=0x7f03001e;
-        public static final int switch_per_day=0x7f03001f;
+        public static final int activity_manage_thermostat=0x7f030019;
+        public static final int activity_manage_weekprogram=0x7f03001a;
+        public static final int activity_overview=0x7f03001b;
+        public static final int activity_splash=0x7f03001c;
+        public static final int support_simple_spinner_dropdown_item=0x7f03001d;
+        public static final int switch_per_day=0x7f03001e;
     }
     public static final class menu {
         public static final int main=0x7f0c0000;
