@@ -24,11 +24,8 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 public class ManageWeekProgram extends ActionBarActivity{
-	private ToggleButton vacation_mode_togglebutton;
-	private SeekBar vacation_mode_seekBar;
-	private TextView vacation_mode_temperature;
-	private boolean refresh = false;
-	private TextView vacation_mode_textView;
+
+    private boolean refresh = false;
 
     private WeekPagerAdapter adapter;
 
@@ -82,7 +79,8 @@ public class ManageWeekProgram extends ActionBarActivity{
 		});*/
 
         this.adapter = new WeekPagerAdapter(getSupportFragmentManager());
-        this.pager = (ViewPager) findViewById(R.layout.activity_manage_weekprogram);
+        this.pager = (ViewPager) findViewById(R.id.weekprogram_pager);
+
         this.pager.setAdapter(this.adapter);
 
         ActionBar bar = getActionBar();
@@ -162,7 +160,7 @@ public class ManageWeekProgram extends ActionBarActivity{
         }
     }
 	
-	public void toOverview(View view){
+	/*public void toOverview(View view){
 		Intent intent = new Intent(this, Overview.class);
 		switch(view.getId()) {
 			case R.id.monday_button:
@@ -190,7 +188,7 @@ public class ManageWeekProgram extends ActionBarActivity{
 				throw new RuntimeException("Unknown day");
 		}
 		startActivity(intent);
-	}
+	}*/
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -235,7 +233,7 @@ public class ManageWeekProgram extends ActionBarActivity{
         protected void onPostExecute(String result) {
         	progressDialog.dismiss();
         	
-        	if (result.equals("on")){
+        	/*if (result.equals("on")){
         		vacation_mode_seekBar.setVisibility(View.VISIBLE);
 				vacation_mode_temperature.setVisibility(View.VISIBLE);
 				vacation_mode_textView.setVisibility(View.VISIBLE);
@@ -248,7 +246,7 @@ public class ManageWeekProgram extends ActionBarActivity{
 				vacation_mode_togglebutton.setChecked(false);
         	} else {
         		throw new RuntimeException("Not valid result");
-        	}
+        	}*/
         }
 
         @Override
@@ -281,8 +279,8 @@ public class ManageWeekProgram extends ActionBarActivity{
         protected void onPostExecute(String result) {
         	progressDialog.dismiss();
         	
-        	vacation_mode_temperature.setText(result);
-        	vacation_mode_seekBar.setProgress((int)Double.parseDouble(result) - 5);
+        	/*vacation_mode_temperature.setText(result);
+        	vacation_mode_seekBar.setProgress((int)Double.parseDouble(result) - 5);*/
         	
         	if(!refresh){
         		//then put to server that you're actually in the vacationmode
