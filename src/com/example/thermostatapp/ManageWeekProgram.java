@@ -1,7 +1,15 @@
 package com.example.thermostatapp;
 
 import java.net.ConnectException;
+import java.util.ArrayList;
 
+import android.app.ActionBar;
+import android.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.view.*;
 import org.thermostatapp.util.HeatingSystem;
 import org.thermostatapp.util.InvalidInputValueException;
 
@@ -10,9 +18,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.SeekBar;
@@ -25,8 +30,11 @@ public class ManageWeekProgram extends ActionBarActivity{
 	private TextView vacation_mode_temperature;
 	private boolean refresh = false;
 	private TextView vacation_mode_textView;
-	
-	
+
+    private WeekPagerAdapter adapter;
+
+    private ViewPager pager;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -74,9 +82,87 @@ public class ManageWeekProgram extends ActionBarActivity{
 				}
 			}
 		});
-		
+
+        this.adapter = new WeekPagerAdapter(getSupportFragmentManager());
+        this.pager = (ViewPager) findViewById(R.id.weekprogram_pager);
+        this.pager.setAdapter(this.adapter);
+
+        ActionBar bar = getActionBar();
+		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+        ActionBar.TabListener tabListener = new ActionBar.TabListener() {
+            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+                ManageWeekProgram.this.pager.setCurrentItem(tab.getPosition(), true);
+            }
+
+            public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+                // hide the given tab
+            }
+
+            public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+                // probably ignore this event
+            }
+        };
+
+        String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+        for(String day : days)
+        {
+            ActionBar.Tab tab = bar.newTab();
+            tab.setText(day);
+            tab.setTabListener(tabListener);
+            bar.addTab(tab);
+        }
+
 		new GetWeekProgramState().execute();
 	}
+
+    class WeekPagerAdapter extends FragmentPagerAdapter
+    {
+
+        Fragment[] fragments = new Fragment[7];
+
+        public WeekPagerAdapter(FragmentManager fm)
+        {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int i)
+        {
+            Fragment f = this.fragments[i];
+            if(f == null) {
+                f = new ManageDayFragment();
+                this.fragments[i] = f;
+            }
+            Bundle data = new Bundle();
+            // Fill data
+            f.setArguments(data);
+            return f;
+        }
+
+        @Override
+        public int getCount()
+        {
+            return 7;
+        }
+    }
+
+    class ManageDayFragment extends Fragment
+    {
+
+        // Add some switches
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
+            // The last two arguments ensure LayoutParams are inflated
+            // properly.
+            View rootView = inflater.inflate(R.layout.fragment_base, container, false);
+            Bundle args = getArguments();
+            // Instantiate the fields
+            return rootView;
+        }
+    }
 	
 	public void toOverview(View view){
 		Intent intent = new Intent(this, Overview.class);

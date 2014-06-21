@@ -1088,7 +1088,7 @@ containing a value of this type.
         public static final int thermostatapp=0x7f02005f;
     }
     public static final class id {
-        public static final int DayNightImage=0x7f05005c;
+        public static final int DayNightImage=0x7f05005d;
         public static final int action_bar=0x7f05001c;
         public static final int action_bar_activity_content=0x7f050015;
         public static final int action_bar_container=0x7f05001b;
@@ -1100,8 +1100,8 @@ containing a value of this type.
         public static final int action_menu_divider=0x7f050016;
         public static final int action_menu_presenter=0x7f050017;
         public static final int action_mode_close_button=0x7f050024;
-        public static final int action_refresh=0x7f05005e;
-        public static final int action_settings=0x7f05005f;
+        public static final int action_refresh=0x7f050060;
+        public static final int action_settings=0x7f050061;
         public static final int activity_chooser_view_content=0x7f050025;
         public static final int always=0x7f05000b;
         public static final int beginning=0x7f050011;
@@ -1110,6 +1110,7 @@ containing a value of this type.
         public static final int current_Temperature_textView=0x7f05003d;
         public static final int current_temperature_seekBar=0x7f050047;
         public static final int current_temperature_textView=0x7f050046;
+        public static final int day_tab=0x7f05005a;
         public static final int day_temperature_seekBar=0x7f050049;
         public static final int day_temperature_textView=0x7f050048;
         public static final int default_activity_button=0x7f050028;
@@ -1163,13 +1164,13 @@ containing a value of this type.
         public static final int split_action_bar=0x7f05001e;
         public static final int submit_area=0x7f050039;
         public static final int sunday_button=0x7f050056;
-        public static final int switchSwitch=0x7f05005d;
-        public static final int switchThreeLayout=0x7f05005a;
+        public static final int switchSwitch=0x7f05005e;
+        public static final int switchThreeLayout=0x7f05005b;
         public static final int tabMode=0x7f050002;
         public static final int target_temperature_seekbar=0x7f05003f;
         public static final int target_temperature_textview=0x7f05003e;
         public static final int thursday_button=0x7f050053;
-        public static final int timeButton=0x7f05005b;
+        public static final int timeButton=0x7f05005c;
         public static final int title=0x7f05002b;
         public static final int top_action_bar=0x7f050020;
         public static final int tuesday_button=0x7f050051;
@@ -1183,6 +1184,7 @@ containing a value of this type.
         public static final int wednesday_button=0x7f050052;
         public static final int weekProgramSwitch=0x7f050044;
         public static final int weekprogram_button=0x7f050045;
+        public static final int weekprogram_pager=0x7f05005f;
         public static final int withText=0x7f05000c;
     }
     public static final class integer {
@@ -1240,8 +1242,10 @@ containing a value of this type.
         public static final int activity_manage_weekprogram=0x7f03001a;
         public static final int activity_overview=0x7f03001b;
         public static final int activity_splash=0x7f03001c;
-        public static final int support_simple_spinner_dropdown_item=0x7f03001d;
-        public static final int switch_per_day=0x7f03001e;
+        public static final int fragment_base=0x7f03001d;
+        public static final int support_simple_spinner_dropdown_item=0x7f03001e;
+        public static final int switch_per_day=0x7f03001f;
+        public static final int weekprogram_pager=0x7f030020;
     }
     public static final class menu {
         public static final int main=0x7f0c0000;

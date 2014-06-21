@@ -26,7 +26,8 @@ public class ManageThermostat extends ActionBarActivity{
 	private SeekBar current_temperature_seekBar;
 	private boolean current_temperature_changed;
 	
-	
+
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

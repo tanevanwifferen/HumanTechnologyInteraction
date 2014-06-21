@@ -243,7 +243,7 @@ int drawable sun 0x7f02005c
 int drawable target 0x7f02005d
 int drawable temperature 0x7f02005e
 int drawable thermostatapp 0x7f02005f
-int id DayNightImage 0x7f05005c
+int id DayNightImage 0x7f05005d
 int id action_bar 0x7f05001c
 int id action_bar_activity_content 0x7f050015
 int id action_bar_container 0x7f05001b
@@ -255,8 +255,8 @@ int id action_context_bar 0x7f05001d
 int id action_menu_divider 0x7f050016
 int id action_menu_presenter 0x7f050017
 int id action_mode_close_button 0x7f050024
-int id action_refresh 0x7f05005e
-int id action_settings 0x7f05005f
+int id action_refresh 0x7f050060
+int id action_settings 0x7f050061
 int id activity_chooser_view_content 0x7f050025
 int id always 0x7f05000b
 int id beginning 0x7f050011
@@ -265,6 +265,7 @@ int id collapseActionView 0x7f05000d
 int id current_Temperature_textView 0x7f05003d
 int id current_temperature_seekBar 0x7f050047
 int id current_temperature_textView 0x7f050046
+int id day_tab 0x7f05005a
 int id day_temperature_seekBar 0x7f050049
 int id day_temperature_textView 0x7f050048
 int id default_activity_button 0x7f050028
@@ -318,13 +319,13 @@ int id showTitle 0x7f050006
 int id split_action_bar 0x7f05001e
 int id submit_area 0x7f050039
 int id sunday_button 0x7f050056
-int id switchSwitch 0x7f05005d
-int id switchThreeLayout 0x7f05005a
+int id switchSwitch 0x7f05005e
+int id switchThreeLayout 0x7f05005b
 int id tabMode 0x7f050002
 int id target_temperature_seekbar 0x7f05003f
 int id target_temperature_textview 0x7f05003e
 int id thursday_button 0x7f050053
-int id timeButton 0x7f05005b
+int id timeButton 0x7f05005c
 int id title 0x7f05002b
 int id top_action_bar 0x7f050020
 int id tuesday_button 0x7f050051
@@ -338,6 +339,7 @@ int id verticallayout 0x7f05003c
 int id wednesday_button 0x7f050052
 int id weekProgramSwitch 0x7f050044
 int id weekprogram_button 0x7f050045
+int id weekprogram_pager 0x7f05005f
 int id withText 0x7f05000c
 int integer abc_max_action_buttons 0x7f090000
 int layout abc_action_bar_decor 0x7f030000
@@ -369,8 +371,10 @@ int layout activity_manage_thermostat 0x7f030019
 int layout activity_manage_weekprogram 0x7f03001a
 int layout activity_overview 0x7f03001b
 int layout activity_splash 0x7f03001c
-int layout support_simple_spinner_dropdown_item 0x7f03001d
-int layout switch_per_day 0x7f03001e
+int layout fragment_base 0x7f03001d
+int layout support_simple_spinner_dropdown_item 0x7f03001e
+int layout switch_per_day 0x7f03001f
+int layout weekprogram_pager 0x7f030020
 int menu main 0x7f0c0000
 int string abc_action_bar_home_description 0x7f0a0001
 int string abc_action_bar_up_description 0x7f0a0002
