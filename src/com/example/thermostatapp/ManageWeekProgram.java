@@ -1,7 +1,6 @@
 package com.example.thermostatapp;
 
 import java.net.ConnectException;
-import java.util.ArrayList;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
@@ -39,8 +38,7 @@ public class ManageWeekProgram extends ActionBarActivity{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_manage_weekprogram);
-		
-		vacation_mode_togglebutton = (ToggleButton) findViewById(R.id.vacation_mode_togglebutton);
+		/*vacation_mode_togglebutton = (ToggleButton) findViewById(R.id.vacation_mode_togglebutton);
 		vacation_mode_seekBar = (SeekBar) findViewById(R.id.vacation_mode_seekBar);
 		vacation_mode_temperature = (TextView) findViewById(R.id.vacation_mode_temperature);
 		vacation_mode_textView = (TextView) findViewById(R.id.vacation_mode_textView);
@@ -81,10 +79,10 @@ public class ManageWeekProgram extends ActionBarActivity{
 				
 				}
 			}
-		});
+		});*/
 
         this.adapter = new WeekPagerAdapter(getSupportFragmentManager());
-        this.pager = (ViewPager) findViewById(R.id.weekprogram_pager);
+        this.pager = (ViewPager) findViewById(R.layout.activity_manage_weekprogram);
         this.pager.setAdapter(this.adapter);
 
         ActionBar bar = getActionBar();

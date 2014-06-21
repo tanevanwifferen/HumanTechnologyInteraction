@@ -39,7 +39,7 @@ public class Home extends ActionBarActivity{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_home2);
+		setContentView(R.layout.activity_home);
 		
 		initializeVariables();
 		setInitialSwitchState();
