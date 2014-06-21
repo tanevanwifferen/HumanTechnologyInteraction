@@ -3,6 +3,8 @@ package com.example.thermostatapp;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import org.thermostatapp.util.WeekProgram;
+
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -22,9 +24,19 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TimePicker;
-
+/* Tane@Mark: Het is heel makkelijk deze class te gebruiken, om data in een
+ * listview te zetten. Per dag (tab) wil je deze regels code toevoegen, in de oncreate()
+ * dan zou hij vanzelf al moeten werken. Succes!!
+ * 
+ *  	ArrayList<org.thermostatapp.util.Switch> switchesToDisplay = weekProgram.getData().get(today);
+ *  	ListView listview = (ListView) findViewById(R.id.listViewToday);	
+ *		listview.setAdapter(new AddSwitchesToScrollViewAdapter(this, switchesToDisplay));
+ * 
+ */
+		
 public class AddSwitchesToScrollViewAdapter extends BaseAdapter {
 
 	Context context;
@@ -32,8 +44,7 @@ public class AddSwitchesToScrollViewAdapter extends BaseAdapter {
 
 	private static LayoutInflater inflater = null;
 
-	public AddSwitchesToScrollViewAdapter(Context context,
-			ArrayList<org.thermostatapp.util.Switch> data) {
+	public AddSwitchesToScrollViewAdapter(Context context, ArrayList<org.thermostatapp.util.Switch> data) {
 		this.context = context;
 		this.data = data;
 		inflater = (LayoutInflater) context
