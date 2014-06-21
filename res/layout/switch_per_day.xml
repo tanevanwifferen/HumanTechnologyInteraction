@@ -10,17 +10,11 @@
         android:layout_height="wrap_content"
         android:gravity="center" >
 
-        <EditText
-            android:id="@+id/timerIndicator"
-            android:layout_width="174dp"
+        <Button
+            android:id="@+id/timeButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:inputType="time"
-            android:text="10:44" >
-
-            <requestFocus />
-        </EditText>
+            android:layout_weight="1" />
 
         <ImageView
             android:id="@+id/DayNightImage"

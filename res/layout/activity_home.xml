@@ -203,11 +203,13 @@
 	        android:text="Schedule" />
 	    
 	    <Button
-	        android:layout_below="@+id/weekProgramSwitch"
+	        android:id="@+id/weekprogram_button"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
-	        android:text="Manage Weekprogram"
-	        android:onClick="toWeekProgram" />
+	        android:layout_below="@+id/weekProgramSwitch"
+	        android:onClick="toWeekProgram"
+	        android:text="Manage Weekprogram" />
+
 	</RelativeLayout>
 
 </RelativeLayout>

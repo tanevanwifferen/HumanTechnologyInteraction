@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -31,6 +32,7 @@ public class Home extends ActionBarActivity{
 	SeekBar target_temperature_seekbar;
 	SeekBar high_temperature_seekbar;
 	SeekBar low_temperature_seekbar;
+	Button week_program_button;
 	Switch weekProgramSwitch;
 	SharedPreferences mPrefs;
 	Editor prefsEditor;
@@ -58,6 +60,7 @@ public class Home extends ActionBarActivity{
 		target_temperature_seekbar = (SeekBar) findViewById(R.id.target_temperature_seekbar);
 		high_temperature_seekbar = (SeekBar) findViewById(R.id.high_temperature_seekbar);
 		low_temperature_seekbar = (SeekBar) findViewById(R.id.low_temperature_seekbar);
+		week_program_button = (Button) findViewById(R.id.weekprogram_button);
 		weekProgramSwitch = (Switch) findViewById(R.id.weekProgramSwitch);
 	}
 	
@@ -85,13 +88,12 @@ public class Home extends ActionBarActivity{
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if(isChecked){
 					prefsEditor.putString("weekProgramState", "on");
-					high_temperature_seekbar.setEnabled(true);
-					low_temperature_seekbar.setEnabled(true);
 				} else {
 					prefsEditor.putString("weekProgramState", "off");
-					high_temperature_seekbar.setEnabled(false);
-					low_temperature_seekbar.setEnabled(false);
 				}
+				high_temperature_seekbar.setEnabled(isChecked);
+				low_temperature_seekbar.setEnabled(isChecked);
+				week_program_button.setEnabled(isChecked);
 				prefsEditor.commit();
 				new PutWeekProgramState().execute();
 			}
@@ -104,6 +106,7 @@ public class Home extends ActionBarActivity{
 			weekProgramSwitch.setChecked(true);
 		} else if (weekProgramState.equals("off")){
 			weekProgramSwitch.setChecked(false);
+			week_program_button.setEnabled(false);
 			high_temperature_seekbar.setEnabled(false);
 			low_temperature_seekbar.setEnabled(false);
 		} else {
