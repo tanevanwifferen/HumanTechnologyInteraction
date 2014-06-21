@@ -10,11 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.ConnectException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -82,7 +78,9 @@ public class HeatingSystem {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (XmlPullParserException e) {
-			e.printStackTrace();
+            e.printStackTrace();
+        } catch (SocketTimeoutException e) {
+            throw new ConnectException(e.getMessage());
 		} catch (IOException e) { // Can also be thrown by getHttpConnection().
 			e.printStackTrace();
 		} finally {
