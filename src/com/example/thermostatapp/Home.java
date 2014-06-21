@@ -5,6 +5,7 @@ import java.net.ConnectException;
 import org.thermostatapp.util.HeatingSystem;
 import org.thermostatapp.util.InvalidInputValueException;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -17,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -57,10 +59,6 @@ public class Home extends ActionBarActivity{
 		high_temperature_seekbar = (SeekBar) findViewById(R.id.high_temperature_seekbar);
 		low_temperature_seekbar = (SeekBar) findViewById(R.id.low_temperature_seekbar);
 		weekProgramSwitch = (Switch) findViewById(R.id.weekProgramSwitch);
-		
-		target_temperature_seekbar.setMax(25);
-		high_temperature_seekbar.setMax(25);
-		low_temperature_seekbar.setMax(25);
 	}
 	
 	private void getInformation(){
@@ -68,16 +66,18 @@ public class Home extends ActionBarActivity{
 		String dayTemperature = mPrefs.getString("dayTemperature", "");
 		String nightTemperature = mPrefs.getString("nightTemperature", "");
 		
-		target_temperature_seekbar.setProgress((int) Double.parseDouble(targetTemperature));
-		high_temperature_seekbar.setProgress((int) Double.parseDouble(dayTemperature));
-		low_temperature_seekbar.setProgress((int) Double.parseDouble(nightTemperature));
+		target_temperature_seekbar.setProgress(temperatureToProgress(targetTemperature));
+		high_temperature_seekbar.setProgress(temperatureToProgress(dayTemperature));
+		low_temperature_seekbar.setProgress(temperatureToProgress(nightTemperature));
 		
-		target_temperature_textview.setText(targetTemperature);
-		high_temperature_textview.setText(dayTemperature);
-		low_temperature_textview.setText(nightTemperature);
+		target_temperature_textview.setText(targetTemperature + "°C");
+		high_temperature_textview.setText(dayTemperature + "°C");
+		low_temperature_textview.setText(nightTemperature + "°C");
 		
 		new GetTemperature().execute();
 	}
+	
+	
 	
 	private void setWeekProgramSwitchChangeListener(){
 		weekProgramSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -92,7 +92,6 @@ public class Home extends ActionBarActivity{
 					high_temperature_seekbar.setEnabled(false);
 					low_temperature_seekbar.setEnabled(false);
 				}
-				
 				prefsEditor.commit();
 				new PutWeekProgramState().execute();
 			}
@@ -113,63 +112,21 @@ public class Home extends ActionBarActivity{
 	}
 	
 	private void setSeekBarOnChangeListener(){
-		target_temperature_seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {}
-			
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {}
-			
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				target_temperature_textview.setText(progress+5 +"");
-				
-				if(fromUser){
-		            prefsEditor.putString("currentTemperature", progress+5 + "");
-		            prefsEditor.commit();
-		            new PutTemperature().execute();
-				}
-			}
-		});
-		
-		
-		high_temperature_seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {}
-			
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {}
-			
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				high_temperature_textview.setText(progress+5 +"");
-				
-				if(fromUser){ //if not refreshed
-		            prefsEditor.putString("dayTemperature", progress+5 + "");
-		            prefsEditor.commit();
-		            new PutTemperature().execute();
-				}
-			}
-		});
-		
-		low_temperature_seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {}
-			
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {}
-			
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				low_temperature_textview.setText(progress+5 +"");
-				if(fromUser){ //if not refreshed
-		            prefsEditor.putString("nightTemperature", progress+5 + "");
-		            prefsEditor.commit();
-		            new PutTemperature().execute();
-				}
-			}
-		});
+		target_temperature_seekbar.setOnSeekBarChangeListener(new SeekbarChangeListener(target_temperature_textview, this, "currentTemperature"));
+		high_temperature_seekbar.setOnSeekBarChangeListener(new SeekbarChangeListener(high_temperature_textview, this, "dayTemperature"));
+		low_temperature_seekbar.setOnSeekBarChangeListener(new SeekbarChangeListener(low_temperature_textview, this, "nightTemperature"));
 	}
+	
+	 public int temperatureToProgress(String temp){
+		 	int output;
+		 	if(temp.endsWith("°C")){
+		 	 String tempNoSuffix = temp.substring(0, temp.length() - 2);
+		 	 output = (int)(Double.parseDouble(tempNoSuffix) * 10) - 50;
+		 	} else {
+		 	 output = (int)(Double.parseDouble(temp) * 10) - 50;
+		 	}
+		 	return output;
+		 }
 	
 	public void toWeekProgram(View view){
 		Intent intent = new Intent(this, ManageWeekProgram.class);
@@ -217,35 +174,7 @@ public class Home extends ActionBarActivity{
 
         @Override
         protected void onPostExecute(String result) {
-        	current_Temperature_textView.setText(currentTemperature);
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-    }
-	
-	private class PutTemperature extends AsyncTask<String, Void, String> {
-		String currentTemperature = mPrefs.getString("currentTemperature", "");
-		String dayTemperature = mPrefs.getString("dayTemperature", "");
-		String nightTemperature = mPrefs.getString("nightTemperature", "");
-				
-        @Override
-        protected String doInBackground(String... params) {
-			try {
-				HeatingSystem.put("currentTemperature", currentTemperature);
-				HeatingSystem.put("dayTemperature", dayTemperature);
-				HeatingSystem.put("nightTemperature", nightTemperature);
-			} catch (IllegalArgumentException e) {
-				throw new IllegalArgumentException("Not valid argument",e);
-			} catch (InvalidInputValueException e) {
-				throw new RuntimeException("Not valid input",e);
-			}
-			return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
+        	current_Temperature_textView.setText(currentTemperature + "°C");
         }
 
         @Override
@@ -286,4 +215,74 @@ public class Home extends ActionBarActivity{
 		Intent intent = new Intent(this, ManageWeekProgram.class);
 		startActivity(intent);
 	}
+}
+
+class SeekbarChangeListener implements OnSeekBarChangeListener {
+	Context context;
+	TextView textview;
+	SharedPreferences mPrefs;
+	SharedPreferences.Editor prefsEditor;
+	String preference;
+	
+	public SeekbarChangeListener(TextView textview, Context context, String preference){
+		this.context = context;
+		this.textview = textview;
+		
+		this.preference = preference;
+		mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+		prefsEditor = mPrefs.edit();
+	}
+
+	@Override
+	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+		textview.setText(progressToTemperature(progress));
+		if(fromUser){ //if not refreshed
+            prefsEditor.putString(preference, (progress+50)/10.0 + "");
+            prefsEditor.commit();
+		}
+		
+	}
+
+	@Override
+	public void onStartTrackingTouch(SeekBar seekBar) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStopTrackingTouch(SeekBar seekBar) {
+		new PutTemperature().execute();		
+	}
+	
+	public String progressToTemperature(int progress){
+	 	return (progress + 50.0)/10.0 + "°C";
+	}
+	 
+	 private class PutTemperature extends AsyncTask<String, Void, String> {
+			String currentTemperature = mPrefs.getString("currentTemperature", "");
+			String dayTemperature = mPrefs.getString("dayTemperature", "");
+			String nightTemperature = mPrefs.getString("nightTemperature", "");
+					
+	        @Override
+	        protected String doInBackground(String... params) {
+				try {
+					HeatingSystem.put("currentTemperature", currentTemperature);
+					HeatingSystem.put("dayTemperature", dayTemperature);
+					HeatingSystem.put("nightTemperature", nightTemperature);
+				} catch (IllegalArgumentException e) {
+					throw new IllegalArgumentException("Not valid argument",e);
+				} catch (InvalidInputValueException e) {
+					throw new RuntimeException("Not valid input",e);
+				}
+				return null;
+	        }
+
+	        @Override
+	        protected void onPostExecute(String result) {
+	        }
+
+	        @Override
+	        protected void onPreExecute() {
+	        }
+	    }
 }
