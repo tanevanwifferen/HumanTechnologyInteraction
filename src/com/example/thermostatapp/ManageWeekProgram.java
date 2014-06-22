@@ -2,9 +2,11 @@ package com.example.thermostatapp;
 
 import java.net.ConnectException;
 import java.util.Calendar;
+
 import org.thermostatapp.util.CorruptWeekProgramException;
 import org.thermostatapp.util.HeatingSystem;
 import org.thermostatapp.util.WeekProgram;
+
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Dialog;
@@ -23,6 +25,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,6 +42,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
 import com.google.gson.Gson;
 
 @SuppressLint("ValidFragment")
@@ -146,6 +150,7 @@ public class ManageWeekProgram extends ActionBarActivity{
 	        state.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					Log.d("Debug", "day: " + day);
 					weekProgram.getData().get(day).get(switchNumber).setState(isChecked);
 					
 					SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(ManageWeekProgram.this);
@@ -227,6 +232,7 @@ public class ManageWeekProgram extends ActionBarActivity{
         @Override
         public Fragment getItem(int i)
         {
+        	Log.d("Debug", "GETITEM: " + i);
         	Fragment f = new ManageDayFragment();
             Bundle data = new Bundle();
             data.putInt("dayIndex", i);
