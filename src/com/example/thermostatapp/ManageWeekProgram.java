@@ -1,29 +1,33 @@
 package com.example.thermostatapp;
 
 import java.net.ConnectException;
+import java.util.ArrayList;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.*;
-import org.thermostatapp.util.HeatingSystem;
-import org.thermostatapp.util.InvalidInputValueException;
+import android.widget.*;
+import com.google.gson.Gson;
+import org.thermostatapp.util.*;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.SeekBar;
-import android.widget.TextView;
-import android.widget.ToggleButton;
 
 public class ManageWeekProgram extends ActionBarActivity{
+
+    private final Gson gson = new Gson();
+
+    private WeekProgram weekProgram;
 
     private boolean refresh = false;
 
@@ -35,6 +39,9 @@ public class ManageWeekProgram extends ActionBarActivity{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_manage_weekprogram);
+
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        this.weekProgram = gson.fromJson(mPrefs.getString("weekProgram", ""), WeekProgram.class);
 		/*vacation_mode_togglebutton = (ToggleButton) findViewById(R.id.vacation_mode_togglebutton);
 		vacation_mode_seekBar = (SeekBar) findViewById(R.id.vacation_mode_seekBar);
 		vacation_mode_temperature = (TextView) findViewById(R.id.vacation_mode_temperature);
@@ -132,6 +139,7 @@ public class ManageWeekProgram extends ActionBarActivity{
             }
             Bundle data = new Bundle();
             // Fill data
+            data.putInt("day", i);
             f.setArguments(data);
             return f;
         }
@@ -149,12 +157,16 @@ public class ManageWeekProgram extends ActionBarActivity{
         // Add some switches
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstance)
         {
             // The last two arguments ensure LayoutParams are inflated
             // properly.
+            Bundle data = getArguments();
             View rootView = inflater.inflate(R.layout.fragment_base, container, false);
-            Bundle args = getArguments();
+            ArrayList<org.thermostatapp.util.Switch> switchesToDisplay = weekProgram.getData().get(data.getInt("day", 0));
+            ListView listview = (ListView) rootView.findViewById(R.id.day_tab);
+            listview.setAdapter(new AddSwitchesToScrollViewAdapter(ManageWeekProgram.this, switchesToDisplay));
+
             // Instantiate the fields
             return rootView;
         }
