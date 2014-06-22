@@ -88,8 +88,12 @@ public class Home extends ActionBarActivity{
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if(isChecked){
 					prefsEditor.putString("weekProgramState", "on");
+					//set sun to sun
+					//set moon to moon
 				} else {
 					prefsEditor.putString("weekProgramState", "off");
+					//set sun to sun_unsaturated
+					//set moon to moon_unsaturated
 				}
 				high_temperature_seekbar.setEnabled(isChecked);
 				low_temperature_seekbar.setEnabled(isChecked);
