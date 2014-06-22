@@ -326,7 +326,7 @@ public class ManageWeekProgram extends ActionBarActivity{
         @Override
         protected void onPostExecute(String result) {
         	progressDialog.dismiss();
-        	int index = ManageWeekProgram.this.getActionBar().getSelectedNavigationIndex();
+        	
             adapter = new WeekPagerAdapter(getSupportFragmentManager());
             pager.setAdapter(adapter);
 
@@ -339,6 +339,10 @@ public class ManageWeekProgram extends ActionBarActivity{
                         getActionBar().setSelectedNavigationItem(position);
                     }
                 });
+            
+            int index = getActionBar().getSelectedNavigationIndex();
+            pager.setCurrentItem(index, true);
+            
         }
 
         @Override
