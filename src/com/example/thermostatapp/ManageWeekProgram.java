@@ -293,11 +293,7 @@ public class ManageWeekProgram extends ActionBarActivity{
 		    case R.id.action_settings:
 		    	break;
 		    case R.id.action_refresh:
-		    	int index = ManageWeekProgram.this.getActionBar().getSelectedNavigationIndex();
 		    	new GetWeekProgram().execute();
-		    	
-//				this.onCreate(null);
-//		    	pager.setCurrentItem(index);
 		    default:
 		    	break;
 		}	
@@ -329,12 +325,18 @@ public class ManageWeekProgram extends ActionBarActivity{
         protected void onPostExecute(String result) {
         	progressDialog.dismiss();
         	int index = ManageWeekProgram.this.getActionBar().getSelectedNavigationIndex();
-//            pager.setCurrentItem(index, true);
-            
-            for (int i = 0; i < 7; i++){
-            	pager.setCurrentItem(i);
-            }
-            pager.setCurrentItem(index);
+            adapter = new WeekPagerAdapter(getSupportFragmentManager());
+            pager.setAdapter(adapter);
+
+            pager.setOnPageChangeListener(
+                new ViewPager.SimpleOnPageChangeListener() {
+                    @Override
+                    public void onPageSelected(int position) {
+                        // When swiping between pages, select the
+                        // corresponding tab.
+                        getActionBar().setSelectedNavigationItem(position);
+                    }
+                });
         }
 
         @Override
