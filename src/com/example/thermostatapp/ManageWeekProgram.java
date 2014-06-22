@@ -16,6 +16,8 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -36,6 +38,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -111,9 +114,7 @@ public class ManageWeekProgram extends ActionBarActivity{
 	private class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
 
         private final String day;
-
         private final int switchNumber;
-        
         private final Button timeButton;
 		
 		private TimePickerFragment(String day, int switchNumber, Button timeButton){
@@ -225,8 +226,9 @@ public class ManageWeekProgram extends ActionBarActivity{
             tableLayout.addView(tr1);
 
             for(int i = 0; i < 10; i++){
-
                 TableRow tr =  new TableRow(ManageWeekProgram.this);
+                
+                //Time
                 final Button time = new Button(ManageWeekProgram.this);
                 final int switchN = i;
                 time.setOnClickListener(new OnClickListener(){
@@ -238,10 +240,10 @@ public class ManageWeekProgram extends ActionBarActivity{
                         showTimePickerDialog(view, day, switchNumber, time);
                     }
                 });
-
                 time.setText(weekProgram.getData().get(day).get(i).getTime());
-                TextView type = new TextView(ManageWeekProgram.this);
-                type.setText(weekProgram.getData().get(day).get(i).getType());
+                time.setGravity(Gravity.CENTER);
+                
+                //State
                 ToggleButton state = new ToggleButton(ManageWeekProgram.this);
                 state.setTextOn("on");
                 state.setTextOff("off");
@@ -251,6 +253,7 @@ public class ManageWeekProgram extends ActionBarActivity{
                 } else {
                     state.setChecked(false);
                 }
+                state.setGravity(Gravity.CENTER);
 
                 state.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
@@ -267,13 +270,31 @@ public class ManageWeekProgram extends ActionBarActivity{
                         new PutWeekProgram().execute();
                     }
                 });
-
-                time.setGravity(Gravity.CENTER);
-                type.setGravity(Gravity.CENTER);
-                state.setGravity(Gravity.CENTER);
+                
+                //Type       
+                ImageView typeImage = new ImageView(ManageWeekProgram.this);
+                Bitmap bp ;
+                String typeString = weekProgram.getData().get(day).get(i).getType();
+                int imageResource;
+                if(typeString.equals("day")){
+                	if(weekProgramState){
+                		imageResource = R.drawable.sun; 
+                	} else {
+                		imageResource = R.drawable.sun_unsaturated;
+                	}
+                } else {
+                	if(weekProgramState){
+                		imageResource = R.drawable.moon;
+                	} else {
+                		imageResource = R.drawable.moon_unsaturated;
+                	}
+                }
+                bp = BitmapFactory.decodeResource(getResources(), imageResource);
+                typeImage.setImageBitmap(bp);
+                
 
                 tr.addView(time);
-                tr.addView(type);
+                tr.addView(typeImage);
                 tr.addView(state);
                 tableLayout.addView(tr);
 
