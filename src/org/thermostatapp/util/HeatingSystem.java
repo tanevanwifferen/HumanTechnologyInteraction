@@ -29,7 +29,7 @@ public class HeatingSystem {
 	public static String WEEK_PROGRAM_ADDRESS = BASE_ADDRESS + "/" + "weekProgram";
 	private final static int TIME_OUT = 10000; // in milliseconds.
 
-    // Needed for the connectivity check in get(String)
+    // Needed for the connectivity check
     private static Context c;
 
     public static void setActivity(Context c) {
