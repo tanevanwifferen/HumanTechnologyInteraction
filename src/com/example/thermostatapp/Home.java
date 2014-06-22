@@ -207,6 +207,7 @@ public class Home extends ActionBarActivity{
         @Override
         protected void onPostExecute(String result) {
         	current_Temperature_textView.setText(currentTemperature + "°C");
+        	target_temperature_seekbar.setProgress(temperatureToProgress(currentTemperature));
         	refreshItem.setActionView(null);
         }
 
@@ -218,6 +219,7 @@ public class Home extends ActionBarActivity{
 	
 	private class GetTemperature2 extends AsyncTask<String, Void, String> {
 		String currentTemperature;
+		
 		
         @Override
         protected String doInBackground(String... params) {
@@ -232,6 +234,7 @@ public class Home extends ActionBarActivity{
         @Override
         protected void onPostExecute(String result) {
         	current_Temperature_textView.setText(currentTemperature + "°C");
+        	target_temperature_seekbar.setProgress(temperatureToProgress(currentTemperature));
         }
     }
 	
