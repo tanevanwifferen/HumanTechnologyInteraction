@@ -36,7 +36,12 @@ public class Home extends ActionBarActivity{
 	Switch weekProgramSwitch;
 	SharedPreferences mPrefs;
 	Editor prefsEditor;
+	private Menu optionsMenu;
+	private boolean firstTime = false;;
 	
+	public Menu getOptionsMenu(){
+		return optionsMenu;
+	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +82,7 @@ public class Home extends ActionBarActivity{
 		high_temperature_textview.setText(dayTemperature + "°C");
 		low_temperature_textview.setText(nightTemperature + "°C");
 		
-		new GetTemperature().execute();
+		new GetTemperature2().execute();
 	}
 	
 	
@@ -142,6 +147,7 @@ public class Home extends ActionBarActivity{
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		optionsMenu = menu;
 	    getMenuInflater().inflate(R.menu.main, menu);
 	    return super.onCreateOptionsMenu(menu);
 	}
@@ -172,6 +178,7 @@ public class Home extends ActionBarActivity{
 	
 	private class GetTemperature extends AsyncTask<String, Void, String> {
 		String currentTemperature;
+		private MenuItem refreshItem = optionsMenu.findItem(R.id.action_refresh);
 		
         @Override
         protected String doInBackground(String... params) {
@@ -186,15 +193,37 @@ public class Home extends ActionBarActivity{
         @Override
         protected void onPostExecute(String result) {
         	current_Temperature_textView.setText(currentTemperature + "°C");
+        	refreshItem.setActionView(null);
         }
 
         @Override
         protected void onPreExecute() {
+        	refreshItem.setActionView(R.layout.actionbar_indeterminate_progress);
+        }
+    }
+	
+	private class GetTemperature2 extends AsyncTask<String, Void, String> {
+		String currentTemperature;
+		
+        @Override
+        protected String doInBackground(String... params) {
+        	try {
+				currentTemperature = HeatingSystem.get("currentTemperature");
+			} catch (ConnectException e) {
+				throw new RuntimeException("Connect exception!",e);
+			}
+        	return null;
+        }
+        
+        @Override
+        protected void onPostExecute(String result) {
+        	current_Temperature_textView.setText(currentTemperature + "°C");
         }
     }
 	
 	private class PutWeekProgramState extends AsyncTask<String, Void, String> {
 		String weekProgramState = mPrefs.getString("weekProgramState", "");
+		private MenuItem refreshItem = optionsMenu.findItem(R.id.action_refresh);
 				
         @Override
         protected String doInBackground(String... params) {
@@ -210,10 +239,12 @@ public class Home extends ActionBarActivity{
 
         @Override
         protected void onPostExecute(String result) {
+        	refreshItem.setActionView(null);
         }
 
         @Override
         protected void onPreExecute() {
+        	refreshItem.setActionView(R.layout.actionbar_indeterminate_progress);
         }
     }
 	
@@ -263,11 +294,13 @@ class SeekbarChangeListener implements OnSeekBarChangeListener {
 	public String progressToTemperature(int progress){
 	 	return (progress + 50.0)/10.0 + "°C";
 	}
+	
 	 
 	 private class PutTemperature extends AsyncTask<String, Void, String> {
 			String currentTemperature = mPrefs.getString("currentTemperature", "");
 			String dayTemperature = mPrefs.getString("dayTemperature", "");
 			String nightTemperature = mPrefs.getString("nightTemperature", "");
+			private MenuItem refreshItem = ((Home) context).getOptionsMenu().findItem(R.id.action_refresh);
 					
 	        @Override
 	        protected String doInBackground(String... params) {
@@ -285,10 +318,12 @@ class SeekbarChangeListener implements OnSeekBarChangeListener {
 
 	        @Override
 	        protected void onPostExecute(String result) {
+	        	refreshItem.setActionView(null);
 	        }
 
 	        @Override
 	        protected void onPreExecute() {
+	        	refreshItem.setActionView(R.layout.actionbar_indeterminate_progress);
 	        }
 	    }
 }

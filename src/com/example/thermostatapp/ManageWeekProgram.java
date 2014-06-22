@@ -11,9 +11,7 @@ import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.FragmentTransaction;
-import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Bitmap;
@@ -56,6 +54,7 @@ public class ManageWeekProgram extends ActionBarActivity{
     private TableLayout tableLayout;
     private SharedPreferences mPrefs;
     private Editor prefsEditor;
+    private Menu optionsMenu;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -304,8 +303,10 @@ public class ManageWeekProgram extends ActionBarActivity{
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		optionsMenu = menu;
 	    getMenuInflater().inflate(R.menu.main, menu);
 	    return super.onCreateOptionsMenu(menu);
+	    
 	}
 	
 	@Override
@@ -324,7 +325,7 @@ public class ManageWeekProgram extends ActionBarActivity{
 	}
 	
 	private class GetWeekProgram extends AsyncTask<String, Void, String> {
-		ProgressDialog progressDialog;
+		private MenuItem refreshItem = optionsMenu.findItem(R.id.action_refresh);
 		
         @Override
         protected String doInBackground(String... params) {
@@ -346,7 +347,7 @@ public class ManageWeekProgram extends ActionBarActivity{
 
         @Override
         protected void onPostExecute(String result) {
-        	progressDialog.dismiss();
+        	refreshItem.setActionView(null);
         	
             adapter = new WeekPagerAdapter(getSupportFragmentManager());
             pager.setAdapter(adapter);
@@ -368,21 +369,29 @@ public class ManageWeekProgram extends ActionBarActivity{
 
         @Override
         protected void onPreExecute() {
-        	progressDialog = new ProgressDialog(ManageWeekProgram.this);
-        	progressDialog.setMessage("Getting information...");
-        	progressDialog.setCancelable(false);
-        	progressDialog.show();
+        	refreshItem.setActionView(R.layout.actionbar_indeterminate_progress);
         }
     }
 	
 	private class PutWeekProgram extends AsyncTask<String, Void, String>{
-
+		private MenuItem refreshItem = optionsMenu.findItem(R.id.action_refresh);
+		
 		@Override
 		protected String doInBackground(String... params) {
 			weekProgram = gson.fromJson(mPrefs.getString("weekProgram", ""), WeekProgram.class);
 			HeatingSystem.setWeekProgram(weekProgram);
 			return null;
 		}
+		
+		@Override
+        protected void onPreExecute() {
+        	refreshItem.setActionView(R.layout.actionbar_indeterminate_progress);
+        }
+		
+		@Override
+        protected void onPostExecute(String result) {
+			refreshItem.setActionView(null);
+        }
 	}
 }
 
