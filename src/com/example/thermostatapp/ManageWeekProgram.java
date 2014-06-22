@@ -66,8 +66,6 @@ public class ManageWeekProgram extends ActionBarActivity{
 
         ActionBar.TabListener tabListener = new ActionBar.TabListener() {
             public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-//            	day = tab.getText().toString();
-                System.out.println(tab.getPosition());
                 pager.setCurrentItem(tab.getPosition(), true);
             }
 
@@ -223,14 +221,6 @@ public class ManageWeekProgram extends ActionBarActivity{
         @Override
         public Fragment getItem(int i)
         {
-        	//cache
-//            Fragment f = this.fragments[i];
-//            if(f == null) {
-//                f = new ManageDayFragment();
-//                this.fragments[i] = f;
-//            }
-        	
-//        	Toast.makeText(ManageWeekProgram.this, i + "", Toast.LENGTH_SHORT).show();
         	Fragment f = new ManageDayFragment();
             Bundle data = new Bundle();
             data.putInt("dayIndex", i);
