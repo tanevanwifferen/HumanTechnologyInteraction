@@ -42,8 +42,7 @@ public class Home extends ActionBarActivity{
 	SharedPreferences mPrefs;
 	Editor prefsEditor;
 	private Menu optionsMenu;
-	private boolean firstTime = false;
-
+	
     private AlertDialog putConnectionFailed;
     private AlertDialog getConnectionFailed;
     private AlertDialog getConnectionFailed2;
@@ -269,7 +268,7 @@ public class Home extends ActionBarActivity{
         @Override
         protected void onPostExecute(String result) {
         	current_Temperature_textView.setText(currentTemperature + "°C");
-        	target_temperature_seekbar.setProgress(temperatureToProgress(currentTemperature));
+        	target_temperature_seekbar.setProgress(temperatureToProgress(mPrefs.getString("currentTemperature","")));
         	refreshItem.setActionView(null);
         }
 
@@ -303,7 +302,7 @@ public class Home extends ActionBarActivity{
         @Override
         protected void onPostExecute(String result) {
         	current_Temperature_textView.setText(currentTemperature + "°C");
-        	target_temperature_seekbar.setProgress(temperatureToProgress(currentTemperature));
+        	target_temperature_seekbar.setProgress(temperatureToProgress(mPrefs.getString("currentTemperature","")));
         }
     }
 
