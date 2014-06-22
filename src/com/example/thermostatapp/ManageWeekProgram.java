@@ -67,6 +67,7 @@ public class ManageWeekProgram extends ActionBarActivity{
         ActionBar.TabListener tabListener = new ActionBar.TabListener() {
             public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
 //            	day = tab.getText().toString();
+                System.out.println(tab.getPosition());
                 pager.setCurrentItem(tab.getPosition(), true);
             }
 
@@ -78,6 +79,16 @@ public class ManageWeekProgram extends ActionBarActivity{
                 // probably ignore this event
             }
         };
+
+        this.pager.setOnPageChangeListener(
+                new ViewPager.SimpleOnPageChangeListener() {
+                    @Override
+                    public void onPageSelected(int position) {
+                        // When swiping between pages, select the
+                        // corresponding tab.
+                        getActionBar().setSelectedNavigationItem(position);
+                    }
+                });
 
         String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
         for(String day : days)
@@ -221,6 +232,9 @@ public class ManageWeekProgram extends ActionBarActivity{
         	
 //        	Toast.makeText(ManageWeekProgram.this, i + "", Toast.LENGTH_SHORT).show();
         	Fragment f = new ManageDayFragment();
+            Bundle data = new Bundle();
+            data.putInt("dayIndex", i);
+            f.setArguments(data);
             return f;
             
         }
@@ -264,8 +278,9 @@ public class ManageWeekProgram extends ActionBarActivity{
     	
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstance){
-        	day = getActionBar().getSelectedTab().getText().toString();
-        	int i = getActionBar().getSelectedNavigationIndex();
+        	Bundle data = getArguments();
+            int i = data.getInt("dayIndex", 0);
+            day = getActionBar().getTabAt(i).getText().toString();
         	Toast.makeText(ManageWeekProgram.this, i + " " + day, Toast.LENGTH_SHORT).show();
         	
         	View rootView = inflater.inflate(R.layout.fragment_base, container, false);
