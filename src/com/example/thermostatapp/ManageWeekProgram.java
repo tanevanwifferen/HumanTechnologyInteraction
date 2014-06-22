@@ -321,8 +321,6 @@ public class ManageWeekProgram extends ActionBarActivity{
 		switch (item.getItemId()) {
 		    case android.R.id.home:
 		    	break;
-		    case R.id.action_settings:
-		    	break;
 		    case R.id.action_refresh:
 		    	new GetWeekProgram().execute();
 		    default:

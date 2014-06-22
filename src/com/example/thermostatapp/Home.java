@@ -1,7 +1,6 @@
 package com.example.thermostatapp;
 
 import java.net.ConnectException;
-import java.util.EventListener;
 
 import org.thermostatapp.util.HeatingSystem;
 import org.thermostatapp.util.InvalidInputValueException;
@@ -19,12 +18,12 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
-import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -173,8 +172,6 @@ public class Home extends ActionBarActivity{
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		    case android.R.id.home:
-		    	break;
-		    case R.id.action_settings:
 		    	break;
 		    case R.id.action_refresh:
 		    	new GetTemperature().execute();
