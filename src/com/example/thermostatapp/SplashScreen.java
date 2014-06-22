@@ -35,22 +35,10 @@ public class SplashScreen extends Activity {
 
         this.connectionFailed = new AlertDialog.Builder(this, AlertDialog.THEME_HOLO_DARK)
                 .setTitle("Connection failed")
-                .setMessage("Failed to connect to the thermostat server. An internet connection is needed to properly use this app.\n" +
+                .setMessage("Failed to connect to the thermostat server. An internet connection is necessary for the app to function.\n" +
                         "\n" +
                         " Please verify that you are connected to the internet before attempting to retry.")
                 .setCancelable(true)
-                .setPositiveButton("Close App", new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        dialog.cancel();
-                        Intent startMain = new Intent(Intent.ACTION_MAIN);
-                        startMain.addCategory(Intent.CATEGORY_HOME);
-                        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(startMain);
-                    }
-                })
                 .setNegativeButton("Retry", new DialogInterface.OnClickListener()
                 {
                     @Override

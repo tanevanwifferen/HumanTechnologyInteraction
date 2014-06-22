@@ -59,20 +59,8 @@ public class Home extends ActionBarActivity{
 
         this.putConnectionFailed = new AlertDialog.Builder(this, AlertDialog.THEME_HOLO_DARK)
                 .setTitle("Connection failed")
-                .setMessage("Failed to send data to the thermostat server. An internet connection is needed to properly use this app.\n\n Please verify that you are connected to the internet before attempting to retry.")
+                .setMessage("Failed to send data to the thermostat server. An internet connection is necessary for the app to function.")
                 .setCancelable(true)
-                .setPositiveButton("Close App", new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        dialog.cancel();
-                        Intent startMain = new Intent(Intent.ACTION_MAIN);
-                        startMain.addCategory(Intent.CATEGORY_HOME);
-                        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(startMain);
-                    }
-                })
                 .setNegativeButton("Retry", new DialogInterface.OnClickListener()
                 {
                     @Override
@@ -86,20 +74,8 @@ public class Home extends ActionBarActivity{
 
         this.getConnectionFailed = new AlertDialog.Builder(this, AlertDialog.THEME_HOLO_DARK)
                 .setTitle("Connection failed")
-                .setMessage("Failed to retrieve data from the thermostat server. An internet connection is needed to properly use this app.\n\n (Please verify that you are connected to the internet before attempting to retry.)")
+                .setMessage("Failed to retrieve data from the thermostat server. An internet connection is necessary for the app to function.")
                 .setCancelable(true)
-                .setPositiveButton("Close App", new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        dialog.cancel();
-                        Intent startMain = new Intent(Intent.ACTION_MAIN);
-                        startMain.addCategory(Intent.CATEGORY_HOME);
-                        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(startMain);
-                    }
-                })
                 .setNegativeButton("Retry", new DialogInterface.OnClickListener()
                 {
                     @Override
@@ -113,20 +89,8 @@ public class Home extends ActionBarActivity{
 
         this.getConnectionFailed2 = new AlertDialog.Builder(this, AlertDialog.THEME_HOLO_DARK)
                 .setTitle("Connection failed")
-                .setMessage("Failed to retrieve data from the thermostat server. An internet connection is needed to properly use this app.\n\n (Please verify that you are connected to the internet before attempting to retry.)")
+                .setMessage("Failed to retrieve data from the thermostat server. An internet connection is necessary for the app to function.")
                 .setCancelable(true)
-                .setPositiveButton("Close App", new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        dialog.cancel();
-                        Intent startMain = new Intent(Intent.ACTION_MAIN);
-                        startMain.addCategory(Intent.CATEGORY_HOME);
-                        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(startMain);
-                    }
-                })
                 .setNegativeButton("Retry", new DialogInterface.OnClickListener()
                 {
                     @Override
