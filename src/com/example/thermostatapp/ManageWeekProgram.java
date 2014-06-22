@@ -2,9 +2,11 @@ package com.example.thermostatapp;
 
 import java.net.ConnectException;
 import java.util.Calendar;
+
 import org.thermostatapp.util.CorruptWeekProgramException;
 import org.thermostatapp.util.HeatingSystem;
 import org.thermostatapp.util.WeekProgram;
+
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Dialog;
@@ -23,6 +25,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,6 +42,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
 import com.google.gson.Gson;
 
 @SuppressLint("ValidFragment")
@@ -97,7 +101,6 @@ public class ManageWeekProgram extends ActionBarActivity{
             bar.addTab(tab);
         }
 	}
-
 	
 	public void showTimePickerDialog(View v, int switchNumber) {
 	    DialogFragment newFragment = new TimePickerFragment(switchNumber);
