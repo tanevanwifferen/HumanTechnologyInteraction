@@ -25,7 +25,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,7 +39,6 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.google.gson.Gson;
@@ -52,14 +50,16 @@ public class ManageWeekProgram extends ActionBarActivity{
     private WeekPagerAdapter adapter;
     private ViewPager pager;
     private TableLayout tableLayout;
-    //private String day;
+    private SharedPreferences mPrefs;
+    private Editor prefsEditor;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_manage_weekprogram);
 
-        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+		mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefsEditor = mPrefs.edit();
         weekProgram = gson.fromJson(mPrefs.getString("weekProgram", ""), WeekProgram.class);
         adapter = new WeekPagerAdapter(getSupportFragmentManager());
         pager = (ViewPager) findViewById(R.id.weekprogram_pager);
@@ -102,8 +102,8 @@ public class ManageWeekProgram extends ActionBarActivity{
         }
 	}
 	
-	public void showTimePickerDialog(View v, String day, int switchNumber) {
-	    DialogFragment newFragment = new TimePickerFragment(day, switchNumber);
+	public void showTimePickerDialog(View v, String day, int switchNumber, Button time) {
+	    DialogFragment newFragment = new TimePickerFragment(day, switchNumber, time);
 	    newFragment.show(getSupportFragmentManager(), "timePicker");
 	}
 	
@@ -112,10 +112,13 @@ public class ManageWeekProgram extends ActionBarActivity{
         private final String day;
 
         private final int switchNumber;
+        
+        private final Button timeButton;
 		
-		private TimePickerFragment(String day, int switchNumber){
+		private TimePickerFragment(String day, int switchNumber, Button timeButton){
             this.day = day;
 			this.switchNumber = switchNumber;
+			this.timeButton = timeButton;
 		}
 		
 		@Override
@@ -143,8 +146,14 @@ public class ManageWeekProgram extends ActionBarActivity{
 			
 			String time = hour + ":" + minuteString;
 			weekProgram.getData().get(day).get(switchNumber).setTime(time);
+			timeButton.setText(time);
 			
-    		tableLayout.removeAllViews();
+			String json = gson.toJson(weekProgram);
+            prefsEditor.putString("weekProgram", json);
+            prefsEditor.commit();
+			
+            new SendWeekProgramToServer().execute();
+			
 		}
 	}
 
@@ -217,7 +226,7 @@ public class ManageWeekProgram extends ActionBarActivity{
             for(int i = 0; i < 10; i++){
 
                 TableRow tr =  new TableRow(ManageWeekProgram.this);
-                Button time = new Button(ManageWeekProgram.this);
+                final Button time = new Button(ManageWeekProgram.this);
                 final int switchN = i;
                 time.setOnClickListener(new OnClickListener(){
 
@@ -225,7 +234,7 @@ public class ManageWeekProgram extends ActionBarActivity{
 
                     @Override
                     public void onClick(View view){
-                        showTimePickerDialog(view, day, switchNumber);
+                        showTimePickerDialog(view, day, switchNumber, time);
                     }
                 });
 
@@ -249,11 +258,7 @@ public class ManageWeekProgram extends ActionBarActivity{
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         weekProgram.getData().get(day).get(switchNumber).setState(isChecked);
-
-                        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(ManageWeekProgram.this);
-                        Editor prefsEditor = mPrefs.edit();
-
-                        Gson gson = new Gson();
+                        
                         String json = gson.toJson(weekProgram);
                         prefsEditor.putString("weekProgram", json);
                         prefsEditor.commit();
@@ -272,7 +277,6 @@ public class ManageWeekProgram extends ActionBarActivity{
                 tableLayout.addView(tr);
 
             }
-//	    Toast.makeText(getApplicationContext(), day, Toast.LENGTH_SHORT).show();
         }
     }
 	
@@ -309,10 +313,6 @@ public class ManageWeekProgram extends ActionBarActivity{
         	//get methods!
 			try {
 				weekProgram = HeatingSystem.getWeekProgram();
-				SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(ManageWeekProgram.this);
-				Editor prefsEditor = mPrefs.edit();
-				
-	            Gson gson = new Gson();
 	            String json = gson.toJson(weekProgram);
 	            prefsEditor.putString("weekProgram", json);
 	            prefsEditor.commit();
@@ -343,7 +343,6 @@ public class ManageWeekProgram extends ActionBarActivity{
 
 		@Override
 		protected String doInBackground(String... params) {
-			SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(ManageWeekProgram.this);
 			weekProgram = gson.fromJson(mPrefs.getString("weekProgram", ""), WeekProgram.class);
 			HeatingSystem.setWeekProgram(weekProgram);
 			return null;
