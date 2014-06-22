@@ -325,10 +325,13 @@ public class ManageWeekProgram extends ActionBarActivity{
         @Override
         protected void onPostExecute(String result) {
         	progressDialog.dismiss();
-        	
-        	tableLayout.removeAllViews();
         	int index = ManageWeekProgram.this.getActionBar().getSelectedNavigationIndex();
-            pager.setCurrentItem(index, true);
+//            pager.setCurrentItem(index, true);
+            
+//            for (int i = 0; i < 7; i++){
+//            	pager.setCurrentItem(i);
+//            }
+            pager.setCurrentItem(index);
         }
 
         @Override
