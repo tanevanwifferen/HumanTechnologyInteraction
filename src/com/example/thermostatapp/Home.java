@@ -73,9 +73,9 @@ public class Home extends ActionBarActivity{
 		high_temperature_seekbar.setProgress(temperatureToProgress(dayTemperature));
 		low_temperature_seekbar.setProgress(temperatureToProgress(nightTemperature));
 		
-		target_temperature_textview.setText(targetTemperature + "째C");
-		high_temperature_textview.setText(dayTemperature + "째C");
-		low_temperature_textview.setText(nightTemperature + "째C");
+		target_temperature_textview.setText(targetTemperature + "캜");
+		high_temperature_textview.setText(dayTemperature + "캜");
+		low_temperature_textview.setText(nightTemperature + "캜");
 		
 		new GetTemperature().execute();
 	}
@@ -122,7 +122,7 @@ public class Home extends ActionBarActivity{
 	
 	 public int temperatureToProgress(String temp){
 		 	int output;
-		 	if(temp.endsWith("째C")){
+		 	if(temp.endsWith("캜")){
 		 	 String tempNoSuffix = temp.substring(0, temp.length() - 2);
 		 	 output = (int)(Double.parseDouble(tempNoSuffix) * 10) - 50;
 		 	} else {
@@ -177,7 +177,7 @@ public class Home extends ActionBarActivity{
 
         @Override
         protected void onPostExecute(String result) {
-        	current_Temperature_textView.setText(currentTemperature + "째C");
+        	current_Temperature_textView.setText(currentTemperature + "캜");
         }
 
         @Override
@@ -258,7 +258,7 @@ class SeekbarChangeListener implements OnSeekBarChangeListener {
 	}
 	
 	public String progressToTemperature(int progress){
-	 	return (progress + 50.0)/10.0 + "째C";
+	 	return (progress + 50.0)/10.0 + "캜";
 	}
 	 
 	 private class PutTemperature extends AsyncTask<String, Void, String> {

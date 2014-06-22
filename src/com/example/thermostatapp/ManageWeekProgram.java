@@ -1,39 +1,54 @@
 package com.example.thermostatapp;
 
 import java.net.ConnectException;
-import java.util.ArrayList;
+import java.util.Calendar;
+
+import org.thermostatapp.util.CorruptWeekProgramException;
+import org.thermostatapp.util.HeatingSystem;
+import org.thermostatapp.util.WeekProgram;
 
 import android.app.ActionBar;
+import android.app.Dialog;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.view.*;
-import android.widget.*;
-import com.google.gson.Gson;
-import org.thermostatapp.util.*;
-
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.text.format.DateFormat;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
+import android.widget.ToggleButton;
+
+import com.google.gson.Gson;
 
 public class ManageWeekProgram extends ActionBarActivity{
-
     private final Gson gson = new Gson();
-
     private WeekProgram weekProgram;
-
-    private boolean refresh = false;
-
     private WeekPagerAdapter adapter;
-
     private ViewPager pager;
+    private TableLayout tableLayout;
+    private String day;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,61 +56,18 @@ public class ManageWeekProgram extends ActionBarActivity{
 		setContentView(R.layout.activity_manage_weekprogram);
 
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        this.weekProgram = gson.fromJson(mPrefs.getString("weekProgram", ""), WeekProgram.class);
-		/*vacation_mode_togglebutton = (ToggleButton) findViewById(R.id.vacation_mode_togglebutton);
-		vacation_mode_seekBar = (SeekBar) findViewById(R.id.vacation_mode_seekBar);
-		vacation_mode_temperature = (TextView) findViewById(R.id.vacation_mode_temperature);
-		vacation_mode_textView = (TextView) findViewById(R.id.vacation_mode_textView);
-				
-		vacation_mode_togglebutton.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if(isChecked){
-					vacation_mode_seekBar.setVisibility(View.VISIBLE);
-					vacation_mode_temperature.setVisibility(View.VISIBLE);
-					vacation_mode_textView.setVisibility(View.VISIBLE);
-					new GetCurrentTemperature().execute();
-				} else {
-					vacation_mode_seekBar.setVisibility(View.GONE);
-					vacation_mode_temperature.setVisibility(View.GONE);
-					vacation_mode_textView.setVisibility(View.GONE);
-					new PutTemperature("","off").execute();
-				}
-			}
-		});
-		
-		
-		vacation_mode_seekBar.setMax(25);
-		vacation_mode_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {}
-			
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {}
-			
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				vacation_mode_temperature.setText(progress+5 +"");
-				if(fromUser){ //if not refreshed
-					//then the seekbar has been changed by the user, so set values
-					new PutTemperature(progress+5 + "", "on").execute(); 
-				} else {
-				
-				}
-			}
-		});*/
-
-        this.adapter = new WeekPagerAdapter(getSupportFragmentManager());
-        this.pager = (ViewPager) findViewById(R.id.weekprogram_pager);
-
-        this.pager.setAdapter(this.adapter);
+        weekProgram = gson.fromJson(mPrefs.getString("weekProgram", ""), WeekProgram.class);
+        adapter = new WeekPagerAdapter(getSupportFragmentManager());
+        pager = (ViewPager) findViewById(R.id.weekprogram_pager);
+        pager.setAdapter(adapter);
 
         ActionBar bar = getActionBar();
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         ActionBar.TabListener tabListener = new ActionBar.TabListener() {
             public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-                ManageWeekProgram.this.pager.setCurrentItem(tab.getPosition(), true);
+//            	day = tab.getText().toString();
+                pager.setCurrentItem(tab.getPosition(), true);
             }
 
             public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
@@ -115,12 +87,120 @@ public class ManageWeekProgram extends ActionBarActivity{
             tab.setTabListener(tabListener);
             bar.addTab(tab);
         }
-
-		new GetWeekProgramState().execute();
+	}
+	
+	
+	private void fillTable(){
+		tableLayout.setStretchAllColumns(true);
+	    tableLayout.bringToFront();
+	    
+	    TableRow tr1 =  new TableRow(this);
+        TextView c11 = new TextView(this);
+        c11.setText("Time");
+        TextView c21 = new TextView(this);
+        c21.setText("Type");
+        TextView c31 = new TextView(this);
+        c31.setText("State");
+        c11.setGravity(Gravity.CENTER);
+        c21.setGravity(Gravity.CENTER);
+        c31.setGravity(Gravity.CENTER);
+        tr1.addView(c11);
+        tr1.addView(c21);
+        tr1.addView(c31);
+        tableLayout.addView(tr1);
+        
+	    for(int i = 0; i < 10; i++){
+			
+	        TableRow tr =  new TableRow(this);
+	        Button time = new Button(this);
+	        final int switchNumber = i;
+	        time.setOnClickListener(new OnClickListener(){
+	        	@Override
+	        	public void onClick(View view){
+	        		showTimePickerDialog(view, switchNumber);
+	        	}
+	        });
+	    
+	        time.setText(weekProgram.getData().get(day).get(i).getTime());
+	        TextView type = new TextView(this);
+	        type.setText(weekProgram.getData().get(day).get(i).getType());
+	        ToggleButton state = new ToggleButton(this);
+	        state.setTextOn("on");
+	        state.setTextOff("off");
+	        boolean weekProgramState = weekProgram.getData().get(day).get(i).getState();
+	        if(weekProgramState){
+	        	state.setChecked(true);
+	        } else {
+	        	state.setChecked(false);
+	        }
+	        
+	        state.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					weekProgram.getData().get(day).get(switchNumber).setState(isChecked);
+					
+					//PUT
+				}
+			});
+	        
+	        time.setGravity(Gravity.CENTER);
+	        type.setGravity(Gravity.CENTER);
+	        state.setGravity(Gravity.CENTER);
+	        
+	        tr.addView(time);
+	        tr.addView(type);
+	        tr.addView(state);
+	        tableLayout.addView(tr);
+	        
+	    }
+//	    Toast.makeText(getApplicationContext(), day, Toast.LENGTH_SHORT).show();
+	}
+	
+	public void showTimePickerDialog(View v, int switchNumber) {
+	    DialogFragment newFragment = new TimePickerFragment(switchNumber);
+	    newFragment.show(getSupportFragmentManager(), "timePicker");
+	}
+	
+	private class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
+		private int switchNumber;
+		
+		private TimePickerFragment(int switchNumber){
+			this.switchNumber = switchNumber;
+		}
+		
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			// Use the current time as the default values for the picker
+			final Calendar c = Calendar.getInstance();
+			int hour = c.get(Calendar.HOUR_OF_DAY);
+			int minute = c.get(Calendar.MINUTE);
+		
+			// Create a new instance of TimePickerDialog and return it
+			return new TimePickerDialog(getActivity(), this, hour, minute,
+								DateFormat.is24HourFormat(getActivity()));
+		}
+		
+		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+			String hour = "" + hourOfDay;
+			String minuteString = "" + minute;
+			if(hourOfDay < 10){
+				hour = "0" + hour;
+			}
+			
+			if(minute < 10){
+				minuteString = "0" + minuteString;
+			}
+			
+			String time = hour + ":" + minuteString;
+			weekProgram.getData().get(day).get(switchNumber).setTime(time);
+			
+    		tableLayout.removeAllViews();
+    		
+    		//PUT
+		}
 	}
 
-    class WeekPagerAdapter extends FragmentPagerAdapter
-    {
+    private class WeekPagerAdapter extends FragmentPagerAdapter{
 
         Fragment[] fragments = new Fragment[7];
 
@@ -132,16 +212,17 @@ public class ManageWeekProgram extends ActionBarActivity{
         @Override
         public Fragment getItem(int i)
         {
-            Fragment f = this.fragments[i];
-            if(f == null) {
-                f = new ManageDayFragment();
-                this.fragments[i] = f;
-            }
-            Bundle data = new Bundle();
-            // Fill data
-            data.putInt("day", i);
-            f.setArguments(data);
+        	//cache
+//            Fragment f = this.fragments[i];
+//            if(f == null) {
+//                f = new ManageDayFragment();
+//                this.fragments[i] = f;
+//            }
+        	
+//        	Toast.makeText(ManageWeekProgram.this, i + "", Toast.LENGTH_SHORT).show();
+        	Fragment f = new ManageDayFragment();
             return f;
+            
         }
 
         @Override
@@ -151,56 +232,53 @@ public class ManageWeekProgram extends ActionBarActivity{
         }
     }
 
-    class ManageDayFragment extends Fragment
-    {
-
-        // Add some switches
-
+    private class ManageDayFragment extends Fragment{
+//    	public ManageDayFragment(int index){
+//    		switch(index){
+//    			case 0: 
+//    				day = "Monday";
+//    				break;
+//    			case 1: 
+//    				day = "Tuesday";
+//    				break;
+//    			case 2:
+//    				day = "Wednesday";
+//    				break;
+//    			case 3:
+//    				day = "Thursday";
+//    				break;
+//    			case 4: 
+//    				day = "Friday";
+//    				break;
+//    			case 5:
+//    				day = "Saturday";
+//    				break;
+//    			case 6:
+//    				day = "Sunday";
+//    				break;
+//    			default:
+//    				throw new RuntimeException("Unknown index (day)");
+//    		}
+//    	}
+    	
+    	
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstance)
-        {
-            // The last two arguments ensure LayoutParams are inflated
-            // properly.
-            Bundle data = getArguments();
-            View rootView = inflater.inflate(R.layout.fragment_base, container, false);
-            ArrayList<org.thermostatapp.util.Switch> switchesToDisplay = weekProgram.getData().get(data.getInt("day", 0));
-            ListView listview = (ListView) rootView.findViewById(R.id.day_tab);
-            listview.setAdapter(new AddSwitchesToScrollViewAdapter(ManageWeekProgram.this, switchesToDisplay));
-
-            // Instantiate the fields
-            return rootView;
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstance){
+        	day = getActionBar().getSelectedTab().getText().toString();
+        	int i = getActionBar().getSelectedNavigationIndex();
+        	Toast.makeText(ManageWeekProgram.this, i + " " + day, Toast.LENGTH_SHORT).show();
+        	
+        	View rootView = inflater.inflate(R.layout.fragment_base, container, false);
+        	
+        	tableLayout = (TableLayout) rootView.findViewById(R.id.day_tab);
+        	TextView textView = (TextView) rootView.findViewById(R.id.day_name);
+        	textView.setText(day);
+        	
+        	tableLayout.removeAllViews();
+        	fillTable();
+    	    return rootView;
         }
     }
-	
-	/*public void toOverview(View view){
-		Intent intent = new Intent(this, Overview.class);
-		switch(view.getId()) {
-			case R.id.monday_button:
-				intent.putExtra("day","Monday");
-				break;
-			case R.id.tuesday_button:
-				intent.putExtra("day","Tuesday");
-				break;
-			case R.id.wednesday_button:
-				intent.putExtra("day","Wednesday");
-				break;
-			case R.id.thursday_button:
-				intent.putExtra("day","Thursday");
-				break;
-			case R.id.friday_button:
-				intent.putExtra("day","Friday");
-				break;
-			case R.id.saturday_button:
-				intent.putExtra("day","Saturday");
-				break;
-			case R.id.sunday_button:
-				intent.putExtra("day","Sunday");
-				break;
-			default:
-				throw new RuntimeException("Unknown day");
-		}
-		startActivity(intent);
-	}*/
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -216,125 +294,29 @@ public class ManageWeekProgram extends ActionBarActivity{
 		    case R.id.action_settings:
 		    	break;
 		    case R.id.action_refresh:
-		    	refresh = true;
-		    	new GetWeekProgramState().execute();
+		    	//get new week program
+		    	
+		    	tableLayout.removeAllViews();
+		    	new GetWeekProgram().execute();
 		    default:
 		    	break;
 		}	
 		return super.onOptionsItemSelected(item);
 	}
 	
-	private class GetWeekProgramState extends AsyncTask<String, Void, String> {
+	private class GetWeekProgram extends AsyncTask<String, Void, String> {
 		ProgressDialog progressDialog;
 		
         @Override
         protected String doInBackground(String... params) {
-        	String weekProgramState;
         	
         	//get methods!
 			try {
-				weekProgramState = HeatingSystem.get("weekProgramState");
+				weekProgram = HeatingSystem.getWeekProgram();
+			} catch (CorruptWeekProgramException e) {
+				throw new RuntimeException("Corrupt week program!",e);
 			} catch (ConnectException e) {
 				throw new RuntimeException("Connect exception!",e);
-			}
-			
-			return weekProgramState;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-        	progressDialog.dismiss();
-        	
-        	/*if (result.equals("on")){
-        		vacation_mode_seekBar.setVisibility(View.VISIBLE);
-				vacation_mode_temperature.setVisibility(View.VISIBLE);
-				vacation_mode_textView.setVisibility(View.VISIBLE);
-				vacation_mode_togglebutton.setChecked(true);
-				new GetCurrentTemperature().execute();
-        	} else if (result.equals("off")){
-        		vacation_mode_seekBar.setVisibility(View.GONE);
-				vacation_mode_temperature.setVisibility(View.GONE);
-				vacation_mode_textView.setVisibility(View.GONE);
-				vacation_mode_togglebutton.setChecked(false);
-        	} else {
-        		throw new RuntimeException("Not valid result");
-        	}*/
-        }
-
-        @Override
-        protected void onPreExecute() {
-        	progressDialog = new ProgressDialog(ManageWeekProgram.this);
-        	progressDialog.setMessage("Getting information...");
-        	progressDialog.setCancelable(false);
-        	progressDialog.show();
-        }
-    }
-	
-	private class GetCurrentTemperature extends AsyncTask<String, Void, String> {
-		ProgressDialog progressDialog;
-		
-        @Override
-        protected String doInBackground(String... params) {
-        	String currentTemperature;
-        	
-        	//get methods!
-			try {
-				currentTemperature = HeatingSystem.get("currentTemperature");
-			} catch (ConnectException e) {
-				throw new RuntimeException("Connect exception!",e);
-			}
-			
-			return currentTemperature;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-        	progressDialog.dismiss();
-        	
-        	/*vacation_mode_temperature.setText(result);
-        	vacation_mode_seekBar.setProgress((int)Double.parseDouble(result) - 5);*/
-        	
-        	if(!refresh){
-        		//then put to server that you're actually in the vacationmode
-        		new PutTemperature(result, "on").execute();
-        	} else {
-        		refresh = false;
-        	}
-        }
-
-        @Override
-        protected void onPreExecute() {
-        	progressDialog = new ProgressDialog(ManageWeekProgram.this);
-        	progressDialog.setMessage("Getting information...");
-        	progressDialog.setCancelable(false);
-        	progressDialog.show();
-        }
-    }
-	
-	
-	private class PutTemperature extends AsyncTask<String, Void, String> {
-		ProgressDialog progressDialog;
-		String currentTemperature;
-		String weekProgramState;
-		
-		private PutTemperature(String currentTemperature, String weekProgramState){
-			this.currentTemperature = currentTemperature;
-			this.weekProgramState = weekProgramState;
-		}
-		
-        @Override
-        protected String doInBackground(String... params) {
-			try {
-				if(weekProgramState.equals("off")){
-					HeatingSystem.put("weekProgramState", "off");
-				} else {
-					HeatingSystem.put("weekProgramState", "on");
-					HeatingSystem.put("currentTemperature", currentTemperature);
-				} 
-			} catch (IllegalArgumentException e) {
-				throw new IllegalArgumentException("Not valid argument",e);
-			} catch (InvalidInputValueException e) {
-				throw new RuntimeException("Not valid input",e);
 			}
 			return null;
         }
@@ -347,9 +329,9 @@ public class ManageWeekProgram extends ActionBarActivity{
         @Override
         protected void onPreExecute() {
         	progressDialog = new ProgressDialog(ManageWeekProgram.this);
-        	progressDialog.setMessage("Saving information...");
+        	progressDialog.setMessage("Getting information...");
         	progressDialog.setCancelable(false);
         	progressDialog.show();
         }
-    }	
+    }
 }

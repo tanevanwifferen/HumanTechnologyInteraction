@@ -22,7 +22,7 @@
 		<TableLayout 
 		    android:layout_width="match_parent"
 		    android:layout_height="match_parent" 
-		    android:id="@+id/overview_tableLayout"/>
+		    android:id="@+id/overview_tableLayout2"/>
 	<!-- 	</TableLayout> -->
 	
 	</LinearLayout>

@@ -48,7 +48,7 @@ public class Overview extends ActionBarActivity{
 	}
 	
 	private void fillTable(){
-		tableLayout = (TableLayout) findViewById(R.id.overview_tableLayout);
+//		tableLayout = (TableLayout) findViewById(R.id.overview_tableLayout);
 		tableLayout.setStretchAllColumns(true);
 	    tableLayout.bringToFront();
 	    
