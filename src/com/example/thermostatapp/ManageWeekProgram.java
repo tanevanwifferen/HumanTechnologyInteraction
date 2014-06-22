@@ -111,9 +111,7 @@ public class ManageWeekProgram extends ActionBarActivity{
 	private class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
 
         private final String day;
-
         private final int switchNumber;
-        
         private final Button timeButton;
 		
 		private TimePickerFragment(String day, int switchNumber, Button timeButton){
