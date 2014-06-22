@@ -2,17 +2,17 @@ package com.example.thermostatapp;
 
 import java.net.ConnectException;
 import java.util.Calendar;
-
 import org.thermostatapp.util.CorruptWeekProgramException;
 import org.thermostatapp.util.HeatingSystem;
 import org.thermostatapp.util.WeekProgram;
-
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -39,9 +39,9 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
 import com.google.gson.Gson;
 
+@SuppressLint("ValidFragment")
 public class ManageWeekProgram extends ActionBarActivity{
     private final Gson gson = new Gson();
     private WeekProgram weekProgram;
@@ -150,7 +150,15 @@ public class ManageWeekProgram extends ActionBarActivity{
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 					weekProgram.getData().get(day).get(switchNumber).setState(isChecked);
 					
-					//PUT
+					SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(ManageWeekProgram.this);
+					Editor prefsEditor = mPrefs.edit();
+					
+		            Gson gson = new Gson();
+		            String json = gson.toJson(weekProgram);
+		            prefsEditor.putString("weekProgram", json);
+		            prefsEditor.commit();
+					
+					new SendWeekProgramToServer().execute();
 				}
 			});
 	        
@@ -206,8 +214,6 @@ public class ManageWeekProgram extends ActionBarActivity{
 			weekProgram.getData().get(day).get(switchNumber).setTime(time);
 			
     		tableLayout.removeAllViews();
-    		
-    		//PUT
 		}
 	}
 
@@ -247,7 +253,7 @@ public class ManageWeekProgram extends ActionBarActivity{
     }
 
     private class ManageDayFragment extends Fragment{
-//    	public ManageDayFragment(int index){
+//	   	public ManageDayFragment(int index){
 //    		switch(index){
 //    			case 0: 
 //    				day = "Monday";
@@ -328,6 +334,14 @@ public class ManageWeekProgram extends ActionBarActivity{
         	//get methods!
 			try {
 				weekProgram = HeatingSystem.getWeekProgram();
+				SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(ManageWeekProgram.this);
+				Editor prefsEditor = mPrefs.edit();
+				
+	            Gson gson = new Gson();
+	            String json = gson.toJson(weekProgram);
+	            prefsEditor.putString("weekProgram", json);
+	            prefsEditor.commit();
+				
 			} catch (CorruptWeekProgramException e) {
 				throw new RuntimeException("Corrupt week program!",e);
 			} catch (ConnectException e) {
@@ -349,4 +363,17 @@ public class ManageWeekProgram extends ActionBarActivity{
         	progressDialog.show();
         }
     }
+	
+	private class SendWeekProgramToServer extends AsyncTask<String, Void, String>{
+
+		@Override
+		protected String doInBackground(String... params) {
+			SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(ManageWeekProgram.this);
+			weekProgram = gson.fromJson(mPrefs.getString("weekProgram", ""), WeekProgram.class);
+			HeatingSystem.setWeekProgram(weekProgram);
+			return null;
+		}
+	}
 }
+
+
