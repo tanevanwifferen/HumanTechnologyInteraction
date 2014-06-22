@@ -1,6 +1,7 @@
 package com.example.thermostatapp;
 
 import java.net.ConnectException;
+import java.util.EventListener;
 
 import org.thermostatapp.util.HeatingSystem;
 import org.thermostatapp.util.InvalidInputValueException;
@@ -9,6 +10,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -18,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ImageView;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -86,15 +90,24 @@ public class Home extends ActionBarActivity{
 		weekProgramSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				Bitmap sunBitmap;
+				Bitmap moonBitmap;
 				if(isChecked){
 					prefsEditor.putString("weekProgramState", "on");
-					//set sun to sun
-					//set moon to moon
+					sunBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.sun);
+					moonBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.moon);
 				} else {
 					prefsEditor.putString("weekProgramState", "off");
-					//set sun to sun_unsaturated
-					//set moon to moon_unsaturated
+					sunBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.sun_unsaturated);
+					moonBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.moon_unsaturated);
 				}
+				
+				ImageView sunView = (ImageView)findViewById(R.id.home_imageview_sun);
+				ImageView moonView = (ImageView)findViewById(R.id.home_imageview_moon);
+				
+				sunView.setImageBitmap(sunBitmap);
+				moonView.setImageBitmap(moonBitmap);
+				
 				high_temperature_seekbar.setEnabled(isChecked);
 				low_temperature_seekbar.setEnabled(isChecked);
 				week_program_button.setEnabled(isChecked);
