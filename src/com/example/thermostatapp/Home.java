@@ -73,9 +73,9 @@ public class Home extends ActionBarActivity{
 		high_temperature_seekbar.setProgress(temperatureToProgress(dayTemperature));
 		low_temperature_seekbar.setProgress(temperatureToProgress(nightTemperature));
 		
-		target_temperature_textview.setText(targetTemperature + "캜");
-		high_temperature_textview.setText(dayTemperature + "캜");
-		low_temperature_textview.setText(nightTemperature + "캜");
+		target_temperature_textview.setText(targetTemperature + "째C");
+		high_temperature_textview.setText(dayTemperature + "째C");
+		low_temperature_textview.setText(nightTemperature + "째C");
 		
 		new GetTemperature().execute();
 	}
@@ -122,7 +122,7 @@ public class Home extends ActionBarActivity{
 	
 	 public int temperatureToProgress(String temp){
 		 	int output;
-		 	if(temp.endsWith("캜")){
+		 	if(temp.endsWith("째C")){
 		 	 String tempNoSuffix = temp.substring(0, temp.length() - 2);
 		 	 output = (int)(Double.parseDouble(tempNoSuffix) * 10) - 50;
 		 	} else {
@@ -162,6 +162,14 @@ public class Home extends ActionBarActivity{
 		return super.onOptionsItemSelected(item);
 	}
 	
+	@Override
+	public void onBackPressed() {
+	    Intent startMain = new Intent(Intent.ACTION_MAIN);      
+	        startMain.addCategory(Intent.CATEGORY_HOME);                        
+	        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);          
+	        startActivity(startMain); 
+	  }
+	
 	private class GetTemperature extends AsyncTask<String, Void, String> {
 		String currentTemperature;
 		
@@ -177,7 +185,7 @@ public class Home extends ActionBarActivity{
 
         @Override
         protected void onPostExecute(String result) {
-        	current_Temperature_textView.setText(currentTemperature + "캜");
+        	current_Temperature_textView.setText(currentTemperature + "째C");
         }
 
         @Override
@@ -208,11 +216,6 @@ public class Home extends ActionBarActivity{
         protected void onPreExecute() {
         }
     }
-	
-	public void toManageThermostat(View view){
-		Intent intent = new Intent(this, ManageThermostat.class);
-		startActivity(intent);
-	}
 	
 	public void toManageWeekProgram(View view){
 		Intent intent = new Intent(this, ManageWeekProgram.class);
@@ -258,7 +261,7 @@ class SeekbarChangeListener implements OnSeekBarChangeListener {
 	}
 	
 	public String progressToTemperature(int progress){
-	 	return (progress + 50.0)/10.0 + "캜";
+	 	return (progress + 50.0)/10.0 + "째C";
 	}
 	 
 	 private class PutTemperature extends AsyncTask<String, Void, String> {

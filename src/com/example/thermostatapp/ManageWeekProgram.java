@@ -13,6 +13,7 @@ import android.app.Dialog;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
@@ -294,7 +295,11 @@ public class ManageWeekProgram extends ActionBarActivity{
 		    case R.id.action_settings:
 		    	break;
 		    case R.id.action_refresh:
+		    	int index = ManageWeekProgram.this.getActionBar().getSelectedNavigationIndex();
 		    	new GetWeekProgram().execute();
+		    	
+//				this.onCreate(null);
+//		    	pager.setCurrentItem(index);
 		    default:
 		    	break;
 		}	
@@ -328,9 +333,9 @@ public class ManageWeekProgram extends ActionBarActivity{
         	int index = ManageWeekProgram.this.getActionBar().getSelectedNavigationIndex();
 //            pager.setCurrentItem(index, true);
             
-//            for (int i = 0; i < 7; i++){
-//            	pager.setCurrentItem(i);
-//            }
+            for (int i = 0; i < 7; i++){
+            	pager.setCurrentItem(i);
+            }
             pager.setCurrentItem(index);
         }
 
