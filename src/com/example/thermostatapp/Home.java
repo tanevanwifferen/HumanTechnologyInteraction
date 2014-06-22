@@ -4,6 +4,7 @@ import java.net.ConnectException;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+
 import org.thermostatapp.util.HeatingSystem;
 import org.thermostatapp.util.InvalidInputValueException;
 
@@ -15,8 +16,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,8 +47,12 @@ public class Home extends ActionBarActivity{
 	private Menu optionsMenu;
 	
     private AlertDialog putConnectionFailed;
-    private AlertDialog getConnectionFailed;
+    private static AlertDialog getConnectionFailed;
     private AlertDialog getConnectionFailed2;
+    
+    private final Handler myHandler = new Handler();
+    
+    
 
 	public Menu getOptionsMenu(){
 		return optionsMenu;
@@ -109,6 +116,20 @@ public class Home extends ActionBarActivity{
 		setSeekBarOnChangeListener();
 		setWeekProgramSwitchChangeListener();
 		getInformation();
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				while(true){
+					try {
+						updateTempToMemory();
+						Thread.sleep(2500);
+					} catch (InterruptedException e) {
+						// sssh
+					}
+				}
+			}
+		}).start();
 	}
 	
 	private void initializeVariables(){
@@ -344,6 +365,50 @@ public class Home extends ActionBarActivity{
 		Intent intent = new Intent(this, ManageWeekProgram.class);
 		startActivity(intent);
 	}
+	
+	public void updateTempToMemory(){
+		 String currentTemperature;
+		try {
+			currentTemperature = HeatingSystem.get("currentTemperature");
+			Editor prefsEditor = mPrefs.edit();
+			prefsEditor.putString("current_temperature", currentTemperature);
+			prefsEditor.commit();
+			myHandler.post(updateGuiRunnable);
+		} catch (ConnectException e) {
+			this.getConnectionFailed2.show();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		 
+	}
+	
+	public void updateCurrentTempFromMemory(){
+		String currentTemperature = mPrefs.getString("current_temperature", "");
+		this.current_Temperature_textView.setText(currentTemperature + "°C");
+	}
+	
+	Runnable guiUpdateTimer = new Runnable() {
+		@Override
+		public void run() {
+			while(true){
+				try {
+					updateTempToMemory();
+					Thread.sleep(2500);
+				} catch (InterruptedException e) {
+					// sssh
+				}
+			}
+		}
+	};
+	
+	Runnable updateGuiRunnable = new Runnable() {
+		
+		@Override
+		public void run() {
+			updateCurrentTempFromMemory();
+		}
+	};
 }
 
 class SeekbarChangeListener implements OnSeekBarChangeListener {
