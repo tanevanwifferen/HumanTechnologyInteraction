@@ -97,81 +97,7 @@ public class ManageWeekProgram extends ActionBarActivity{
             bar.addTab(tab);
         }
 	}
-	
-	
-	private void fillTable(){
-		tableLayout.setStretchAllColumns(true);
-	    tableLayout.bringToFront();
-	    
-	    TableRow tr1 =  new TableRow(this);
-        TextView c11 = new TextView(this);
-        c11.setText("Time");
-        TextView c21 = new TextView(this);
-        c21.setText("Type");
-        TextView c31 = new TextView(this);
-        c31.setText("State");
-        c11.setGravity(Gravity.CENTER);
-        c21.setGravity(Gravity.CENTER);
-        c31.setGravity(Gravity.CENTER);
-        tr1.addView(c11);
-        tr1.addView(c21);
-        tr1.addView(c31);
-        tableLayout.addView(tr1);
-        
-	    for(int i = 0; i < 10; i++){
-			
-	        TableRow tr =  new TableRow(this);
-	        Button time = new Button(this);
-	        final int switchNumber = i;
-	        time.setOnClickListener(new OnClickListener(){
-	        	@Override
-	        	public void onClick(View view){
-	        		showTimePickerDialog(view, switchNumber);
-	        	}
-	        });
-	    
-	        time.setText(weekProgram.getData().get(day).get(i).getTime());
-	        TextView type = new TextView(this);
-	        type.setText(weekProgram.getData().get(day).get(i).getType());
-	        ToggleButton state = new ToggleButton(this);
-	        state.setTextOn("on");
-	        state.setTextOff("off");
-	        boolean weekProgramState = weekProgram.getData().get(day).get(i).getState();
-	        if(weekProgramState){
-	        	state.setChecked(true);
-	        } else {
-	        	state.setChecked(false);
-	        }
-	        
-	        state.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-				@Override
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-					weekProgram.getData().get(day).get(switchNumber).setState(isChecked);
-					
-					SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(ManageWeekProgram.this);
-					Editor prefsEditor = mPrefs.edit();
-					
-		            Gson gson = new Gson();
-		            String json = gson.toJson(weekProgram);
-		            prefsEditor.putString("weekProgram", json);
-		            prefsEditor.commit();
-					
-					new SendWeekProgramToServer().execute();
-				}
-			});
-	        
-	        time.setGravity(Gravity.CENTER);
-	        type.setGravity(Gravity.CENTER);
-	        state.setGravity(Gravity.CENTER);
-	        
-	        tr.addView(time);
-	        tr.addView(type);
-	        tr.addView(state);
-	        tableLayout.addView(tr);
-	        
-	    }
-//	    Toast.makeText(getApplicationContext(), day, Toast.LENGTH_SHORT).show();
-	}
+
 	
 	public void showTimePickerDialog(View v, int switchNumber) {
 	    DialogFragment newFragment = new TimePickerFragment(switchNumber);
@@ -227,10 +153,8 @@ public class ManageWeekProgram extends ActionBarActivity{
         @Override
         public Fragment getItem(int i)
         {
-        	Fragment f = new ManageDayFragment();
-            Bundle data = new Bundle();
-            data.putInt("dayIndex", i);
-            f.setArguments(data);
+            String day = getActionBar().getTabAt(i).getText().toString();
+        	Fragment f = new ManageDayFragment(day);
             return f;
             
         }
@@ -243,42 +167,16 @@ public class ManageWeekProgram extends ActionBarActivity{
     }
 
     private class ManageDayFragment extends Fragment{
-//	   	public ManageDayFragment(int index){
-//    		switch(index){
-//    			case 0: 
-//    				day = "Monday";
-//    				break;
-//    			case 1: 
-//    				day = "Tuesday";
-//    				break;
-//    			case 2:
-//    				day = "Wednesday";
-//    				break;
-//    			case 3:
-//    				day = "Thursday";
-//    				break;
-//    			case 4: 
-//    				day = "Friday";
-//    				break;
-//    			case 5:
-//    				day = "Saturday";
-//    				break;
-//    			case 6:
-//    				day = "Sunday";
-//    				break;
-//    			default:
-//    				throw new RuntimeException("Unknown index (day)");
-//    		}
-//    	}
-    	
+
+        private final String day;
+
+        public ManageDayFragment(String day) {
+            this.day = day;
+        }
     	
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstance){
-        	Bundle data = getArguments();
-            int i = data.getInt("dayIndex", 0);
-            day = getActionBar().getTabAt(i).getText().toString();
-        	Toast.makeText(ManageWeekProgram.this, i + " " + day, Toast.LENGTH_SHORT).show();
-        	
+
         	View rootView = inflater.inflate(R.layout.fragment_base, container, false);
         	
         	tableLayout = (TableLayout) rootView.findViewById(R.id.day_tab);
@@ -288,6 +186,86 @@ public class ManageWeekProgram extends ActionBarActivity{
         	tableLayout.removeAllViews();
         	fillTable();
     	    return rootView;
+        }
+
+        private void fillTable(){
+            tableLayout.setStretchAllColumns(true);
+            tableLayout.bringToFront();
+
+            TableRow tr1 =  new TableRow(ManageWeekProgram.this);
+            TextView c11 = new TextView(ManageWeekProgram.this);
+            c11.setText("Time");
+            TextView c21 = new TextView(ManageWeekProgram.this);
+            c21.setText("Type");
+            TextView c31 = new TextView(ManageWeekProgram.this);
+            c31.setText("State");
+            c11.setGravity(Gravity.CENTER);
+            c21.setGravity(Gravity.CENTER);
+            c31.setGravity(Gravity.CENTER);
+            tr1.addView(c11);
+            tr1.addView(c21);
+            tr1.addView(c31);
+            tableLayout.addView(tr1);
+
+            for(int i = 0; i < 10; i++){
+
+                TableRow tr =  new TableRow(ManageWeekProgram.this);
+                Button time = new Button(ManageWeekProgram.this);
+                final int switchN = i;
+                time.setOnClickListener(new OnClickListener(){
+
+                    private final int switchNumber = switchN;
+
+                    @Override
+                    public void onClick(View view){
+                        showTimePickerDialog(view, switchNumber);
+                    }
+                });
+
+                time.setText(weekProgram.getData().get(day).get(i).getTime());
+                TextView type = new TextView(ManageWeekProgram.this);
+                type.setText(weekProgram.getData().get(day).get(i).getType());
+                ToggleButton state = new ToggleButton(ManageWeekProgram.this);
+                state.setTextOn("on");
+                state.setTextOff("off");
+                boolean weekProgramState = weekProgram.getData().get(day).get(i).getState();
+                if(weekProgramState){
+                    state.setChecked(true);
+                } else {
+                    state.setChecked(false);
+                }
+
+                state.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+                    private final int switchNumber = switchN;
+
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        weekProgram.getData().get(day).get(switchNumber).setState(isChecked);
+
+                        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(ManageWeekProgram.this);
+                        Editor prefsEditor = mPrefs.edit();
+
+                        Gson gson = new Gson();
+                        String json = gson.toJson(weekProgram);
+                        prefsEditor.putString("weekProgram", json);
+                        prefsEditor.commit();
+
+                        new SendWeekProgramToServer().execute();
+                    }
+                });
+
+                time.setGravity(Gravity.CENTER);
+                type.setGravity(Gravity.CENTER);
+                state.setGravity(Gravity.CENTER);
+
+                tr.addView(time);
+                tr.addView(type);
+                tr.addView(state);
+                tableLayout.addView(tr);
+
+            }
+//	    Toast.makeText(getApplicationContext(), day, Toast.LENGTH_SHORT).show();
         }
     }
 	
