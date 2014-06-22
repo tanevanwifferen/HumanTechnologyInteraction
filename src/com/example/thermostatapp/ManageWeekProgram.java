@@ -401,10 +401,14 @@ public class ManageWeekProgram extends ActionBarActivity{
 			} catch (CorruptWeekProgramException e) {
 				throw new RuntimeException("Corrupt week program!",e);
 			} catch (ConnectException e) {
-                ManageWeekProgram.this.getConnectionFailed.show();
 				this.cancel(true);
 			}
 			return null;
+        }
+
+        @Override
+        protected void onCancelled(String s) {
+            ManageWeekProgram.this.getConnectionFailed.show();
         }
 
         @Override
@@ -445,13 +449,17 @@ public class ManageWeekProgram extends ActionBarActivity{
                 weekProgram = gson.fromJson(mPrefs.getString("weekProgram", ""), WeekProgram.class);
                 HeatingSystem.setWeekProgram(weekProgram);
             } catch(ConnectException e) {
-                ManageWeekProgram.this.putConnectionFailed.show();
                 this.cancel(true);
             } finally {
                 HeatingSystem.unsetActivity();
             }
 			return null;
 		}
+
+        @Override
+        protected void onCancelled(Void s) {
+            ManageWeekProgram.this.putConnectionFailed.show();
+        }
 		
 		@Override
         protected void onPreExecute() {
