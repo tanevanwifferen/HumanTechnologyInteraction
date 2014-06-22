@@ -192,12 +192,14 @@ public class Home extends ActionBarActivity{
 	
 	private class GetTemperature extends AsyncTask<String, Void, String> {
 		String currentTemperature;
+		String targetTemperature;
 		private MenuItem refreshItem = optionsMenu.findItem(R.id.action_refresh);
 		
         @Override
         protected String doInBackground(String... params) {
         	try {
 				currentTemperature = HeatingSystem.get("currentTemperature");
+				targetTemperature = HeatingSystem.get("targetTemperature");
 			} catch (ConnectException e) {
 				throw new RuntimeException("Connect exception!",e);
 			}
@@ -207,7 +209,7 @@ public class Home extends ActionBarActivity{
         @Override
         protected void onPostExecute(String result) {
         	current_Temperature_textView.setText(currentTemperature + "°C");
-        	target_temperature_seekbar.setProgress(temperatureToProgress(currentTemperature));
+        	target_temperature_seekbar.setProgress(temperatureToProgress(targetTemperature));
         	refreshItem.setActionView(null);
         }
 
@@ -219,12 +221,13 @@ public class Home extends ActionBarActivity{
 	
 	private class GetTemperature2 extends AsyncTask<String, Void, String> {
 		String currentTemperature;
-		
+		String targetTemperature;
 		
         @Override
         protected String doInBackground(String... params) {
         	try {
 				currentTemperature = HeatingSystem.get("currentTemperature");
+				targetTemperature = HeatingSystem.get("targetTemperature");
 			} catch (ConnectException e) {
 				throw new RuntimeException("Connect exception!",e);
 			}
@@ -234,7 +237,7 @@ public class Home extends ActionBarActivity{
         @Override
         protected void onPostExecute(String result) {
         	current_Temperature_textView.setText(currentTemperature + "°C");
-        	target_temperature_seekbar.setProgress(temperatureToProgress(currentTemperature));
+        	target_temperature_seekbar.setProgress(temperatureToProgress(targetTemperature));
         }
     }
 	
