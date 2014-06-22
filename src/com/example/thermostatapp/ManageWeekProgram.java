@@ -254,7 +254,6 @@ public class ManageWeekProgram extends ActionBarActivity{
                     state.setChecked(false);
                 }
                 state.setGravity(Gravity.CENTER);
-
                 state.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
                     private final int switchNumber = switchN;
@@ -268,6 +267,10 @@ public class ManageWeekProgram extends ActionBarActivity{
                         prefsEditor.commit();
 
                         new PutWeekProgram().execute();
+                        
+                        TableRow row = (TableRow)buttonView.getParent();
+                        ImageView imageView = (ImageView) row.getChildAt(1);
+                        imageView.setImageBitmap(getBitmapForState(isChecked, weekProgram.getData().get(day).get(switchNumber).getType()));
                     }
                 });
                 
@@ -275,21 +278,7 @@ public class ManageWeekProgram extends ActionBarActivity{
                 ImageView typeImage = new ImageView(ManageWeekProgram.this);
                 Bitmap bp ;
                 String typeString = weekProgram.getData().get(day).get(i).getType();
-                int imageResource;
-                if(typeString.equals("day")){
-                	if(weekProgramState){
-                		imageResource = R.drawable.sun; 
-                	} else {
-                		imageResource = R.drawable.sun_unsaturated;
-                	}
-                } else {
-                	if(weekProgramState){
-                		imageResource = R.drawable.moon;
-                	} else {
-                		imageResource = R.drawable.moon_unsaturated;
-                	}
-                }
-                bp = BitmapFactory.decodeResource(getResources(), imageResource);
+                bp = getBitmapForState(weekProgramState, typeString);
                 typeImage.setImageBitmap(bp);
                 
 
@@ -299,6 +288,24 @@ public class ManageWeekProgram extends ActionBarActivity{
                 tableLayout.addView(tr);
 
             }
+        }
+        
+        public Bitmap getBitmapForState(boolean state, String type){
+        	int index;
+        	if(type.equals("day")){
+            	if(state){
+            		index = R.drawable.sun; 
+            	} else {
+            		index = R.drawable.sun_unsaturated;
+            	}
+            } else {
+            	if(state){
+            		index = R.drawable.moon;
+            	} else {
+            		index = R.drawable.moon_unsaturated;
+            	}
+            }
+        	return BitmapFactory.decodeResource(getResources(), index);
         }
     }
 	
