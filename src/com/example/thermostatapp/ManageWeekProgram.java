@@ -3,15 +3,14 @@ package com.example.thermostatapp;
 import java.net.ConnectException;
 import java.util.Calendar;
 
+import android.app.*;
+import android.content.DialogInterface;
+import android.content.Intent;
 import org.thermostatapp.util.CorruptWeekProgramException;
 import org.thermostatapp.util.HeatingSystem;
 import org.thermostatapp.util.WeekProgram;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
-import android.app.Dialog;
-import android.app.FragmentTransaction;
-import android.app.TimePickerDialog;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Bitmap;
@@ -55,6 +54,10 @@ public class ManageWeekProgram extends ActionBarActivity{
     private SharedPreferences mPrefs;
     private Editor prefsEditor;
     private Menu optionsMenu;
+
+    AlertDialog putConnectionFailed;
+
+    AlertDialog getConnectionFailed;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +106,59 @@ public class ManageWeekProgram extends ActionBarActivity{
             tab.setTabListener(tabListener);
             bar.addTab(tab);
         }
+
+        this.putConnectionFailed = new AlertDialog.Builder(this, AlertDialog.THEME_HOLO_DARK)
+                .setTitle("Connection failed")
+                .setMessage("Failed to send data to the thermostat server. An internet connection is needed to properly use this app.\n\n Please verify that you are connected to the internet before attempting to retry.")
+                .setCancelable(true)
+                .setPositiveButton("Close App", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.cancel();
+                        Intent startMain = new Intent(Intent.ACTION_MAIN);
+                        startMain.addCategory(Intent.CATEGORY_HOME);
+                        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(startMain);
+                    }
+                })
+                .setNegativeButton("Retry", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.cancel();
+                        new PutWeekProgram().execute();
+                    }
+                })
+                .create();
+        this.getConnectionFailed = new AlertDialog.Builder(this, AlertDialog.THEME_HOLO_DARK)
+                .setTitle("Connection failed")
+                .setMessage("Failed to retrieve data from the thermostat server. An internet connection is needed to properly use this app.\n\n (Please verify that you are connected to the internet before attempting to retry.)")
+                .setCancelable(true)
+                .setPositiveButton("Close App", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.cancel();
+                        Intent startMain = new Intent(Intent.ACTION_MAIN);
+                        startMain.addCategory(Intent.CATEGORY_HOME);
+                        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(startMain);
+                    }
+                })
+                .setNegativeButton("Retry", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.cancel();
+                        new GetWeekProgram().execute();
+                    }
+                })
+                .create();
 	}
 	
 	public void showTimePickerDialog(View v, String day, int switchNumber, Button time) {
@@ -345,7 +401,8 @@ public class ManageWeekProgram extends ActionBarActivity{
 			} catch (CorruptWeekProgramException e) {
 				throw new RuntimeException("Corrupt week program!",e);
 			} catch (ConnectException e) {
-				throw new RuntimeException("Connect exception!",e);
+                ManageWeekProgram.this.getConnectionFailed.show();
+				this.cancel(true);
 			}
 			return null;
         }
@@ -378,13 +435,21 @@ public class ManageWeekProgram extends ActionBarActivity{
         }
     }
 	
-	private class PutWeekProgram extends AsyncTask<String, Void, String>{
+	private class PutWeekProgram extends AsyncTask<String, Void, Void>{
 		private MenuItem refreshItem = optionsMenu.findItem(R.id.action_refresh);
 		
 		@Override
-		protected String doInBackground(String... params) {
-			weekProgram = gson.fromJson(mPrefs.getString("weekProgram", ""), WeekProgram.class);
-			HeatingSystem.setWeekProgram(weekProgram);
+		protected Void doInBackground(String... params) {
+            HeatingSystem.setActivity(ManageWeekProgram.this);
+            try {
+                weekProgram = gson.fromJson(mPrefs.getString("weekProgram", ""), WeekProgram.class);
+                HeatingSystem.setWeekProgram(weekProgram);
+            } catch(ConnectException e) {
+                ManageWeekProgram.this.putConnectionFailed.show();
+                this.cancel(true);
+            } finally {
+                HeatingSystem.unsetActivity();
+            }
 			return null;
 		}
 		
@@ -394,7 +459,7 @@ public class ManageWeekProgram extends ActionBarActivity{
         }
 		
 		@Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(Void result) {
 			refreshItem.setActionView(null);
         }
 	}

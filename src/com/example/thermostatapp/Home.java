@@ -2,6 +2,8 @@ package com.example.thermostatapp;
 
 import java.net.ConnectException;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import org.thermostatapp.util.HeatingSystem;
 import org.thermostatapp.util.InvalidInputValueException;
 
@@ -40,8 +42,11 @@ public class Home extends ActionBarActivity{
 	SharedPreferences mPrefs;
 	Editor prefsEditor;
 	private Menu optionsMenu;
-	private boolean firstTime = false;;
-	
+	private boolean firstTime = false;
+
+    private AlertDialog putConnectionFailed;
+    private AlertDialog getConnectionFailed;
+
 	public Menu getOptionsMenu(){
 		return optionsMenu;
 	}
@@ -50,7 +55,61 @@ public class Home extends ActionBarActivity{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
-		
+
+        this.putConnectionFailed = new AlertDialog.Builder(this, AlertDialog.THEME_HOLO_DARK)
+                .setTitle("Connection failed")
+                .setMessage("Failed to send data to the thermostat server. An internet connection is needed to properly use this app.\n\n Please verify that you are connected to the internet before attempting to retry.")
+                .setCancelable(true)
+                .setPositiveButton("Close App", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.cancel();
+                        Intent startMain = new Intent(Intent.ACTION_MAIN);
+                        startMain.addCategory(Intent.CATEGORY_HOME);
+                        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(startMain);
+                    }
+                })
+                .setNegativeButton("Retry", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.cancel();
+                        new PutWeekProgramState().execute();
+                    }
+                })
+                .create();
+
+        this.getConnectionFailed = new AlertDialog.Builder(this, AlertDialog.THEME_HOLO_DARK)
+                .setTitle("Connection failed")
+                .setMessage("Failed to retrieve data from the thermostat server. An internet connection is needed to properly use this app.\n\n (Please verify that you are connected to the internet before attempting to retry.)")
+                .setCancelable(true)
+                .setPositiveButton("Close App", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.cancel();
+                        Intent startMain = new Intent(Intent.ACTION_MAIN);
+                        startMain.addCategory(Intent.CATEGORY_HOME);
+                        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(startMain);
+                    }
+                })
+                .setNegativeButton("Retry", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.cancel();
+                        new GetTemperature().execute();
+                    }
+                })
+                .create();
+
 		initializeVariables();
 		setInitialSwitchState();
 		setSeekBarOnChangeListener();
@@ -85,7 +144,7 @@ public class Home extends ActionBarActivity{
 		high_temperature_textview.setText(dayTemperature + "°C");
 		low_temperature_textview.setText(nightTemperature + "°C");
 		
-		new GetTemperature2().execute();
+		new GetTemperature().execute();
 	}
 	
 	
@@ -136,9 +195,9 @@ public class Home extends ActionBarActivity{
 	}
 	
 	private void setSeekBarOnChangeListener(){
-		target_temperature_seekbar.setOnSeekBarChangeListener(new SeekbarChangeListener(target_temperature_textview, this, "currentTemperature"));
-		high_temperature_seekbar.setOnSeekBarChangeListener(new SeekbarChangeListener(high_temperature_textview, this, "dayTemperature"));
-		low_temperature_seekbar.setOnSeekBarChangeListener(new SeekbarChangeListener(low_temperature_textview, this, "nightTemperature"));
+		target_temperature_seekbar.setOnSeekBarChangeListener(new SeekbarChangeListener(target_temperature_textview, this, "currentTemperature", this.putConnectionFailed));
+		high_temperature_seekbar.setOnSeekBarChangeListener(new SeekbarChangeListener(high_temperature_textview, this, "dayTemperature", this.putConnectionFailed));
+		low_temperature_seekbar.setOnSeekBarChangeListener(new SeekbarChangeListener(low_temperature_textview, this, "nightTemperature", this.putConnectionFailed));
 	}
 	
 	 public int temperatureToProgress(String temp){
@@ -196,11 +255,15 @@ public class Home extends ActionBarActivity{
 		
         @Override
         protected String doInBackground(String... params) {
-        	try {
+        	HeatingSystem.setActivity(Home.this);
+            try {
 				currentTemperature = HeatingSystem.get("currentTemperature");
 			} catch (ConnectException e) {
-				throw new RuntimeException("Connect exception!",e);
-			}
+                Home.this.getConnectionFailed.show();
+				this.cancel(true);
+			} finally {
+                HeatingSystem.unsetActivity();
+            }
         	return null;
         }
 
@@ -216,16 +279,19 @@ public class Home extends ActionBarActivity{
         }
     }
 	
-	private class GetTemperature2 extends AsyncTask<String, Void, String> {
+	/*private class GetTemperature2 extends AsyncTask<String, Void, String> {
 		String currentTemperature;
 		
         @Override
         protected String doInBackground(String... params) {
-        	try {
+            HeatingSystem.setActivity(Home.this);
+            try {
 				currentTemperature = HeatingSystem.get("currentTemperature");
 			} catch (ConnectException e) {
 				throw new RuntimeException("Connect exception!",e);
-			}
+			} finally {
+                HeatingSystem.unsetActivity();
+            }
         	return null;
         }
         
@@ -233,7 +299,7 @@ public class Home extends ActionBarActivity{
         protected void onPostExecute(String result) {
         	current_Temperature_textView.setText(currentTemperature + "°C");
         }
-    }
+    }*/
 	
 	private class PutWeekProgramState extends AsyncTask<String, Void, String> {
 		String weekProgramState = mPrefs.getString("weekProgramState", "");
@@ -241,8 +307,11 @@ public class Home extends ActionBarActivity{
 				
         @Override
         protected String doInBackground(String... params) {
-			try {
-				HeatingSystem.put("weekProgramState", weekProgramState);
+			try{
+                HeatingSystem.put("weekProgramState", weekProgramState);
+            } catch (ConnectException e) {
+                Home.this.putConnectionFailed.show();
+                this.cancel(true);
 			} catch (IllegalArgumentException e) {
 				throw new IllegalArgumentException("Not valid argument",e);
 			} catch (InvalidInputValueException e) {
@@ -274,14 +343,18 @@ class SeekbarChangeListener implements OnSeekBarChangeListener {
 	SharedPreferences mPrefs;
 	SharedPreferences.Editor prefsEditor;
 	String preference;
+
+    private final AlertDialog putConnectionFailed;
 	
-	public SeekbarChangeListener(TextView textview, Context context, String preference){
+	public SeekbarChangeListener(TextView textview, Context context, String preference, AlertDialog putConnectionFailed){
 		this.context = context;
 		this.textview = textview;
 		
 		this.preference = preference;
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 		prefsEditor = mPrefs.edit();
+
+        this.putConnectionFailed = putConnectionFailed;
 	}
 
 	@Override
@@ -322,7 +395,10 @@ class SeekbarChangeListener implements OnSeekBarChangeListener {
 					HeatingSystem.put("currentTemperature", currentTemperature);
 					HeatingSystem.put("dayTemperature", dayTemperature);
 					HeatingSystem.put("nightTemperature", nightTemperature);
-				} catch (IllegalArgumentException e) {
+				} catch(ConnectException e) {
+                    SeekbarChangeListener.this.putConnectionFailed.show();
+                    this.cancel(true);
+                } catch (IllegalArgumentException e) {
 					throw new IllegalArgumentException("Not valid argument",e);
 				} catch (InvalidInputValueException e) {
 					throw new RuntimeException("Not valid input",e);

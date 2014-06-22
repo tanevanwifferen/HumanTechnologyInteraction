@@ -2,6 +2,8 @@ package com.example.thermostatapp;
 
 import java.net.ConnectException;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import org.thermostatapp.util.CorruptWeekProgramException;
 import org.thermostatapp.util.HeatingSystem;
 import org.thermostatapp.util.WeekProgram;
@@ -23,12 +25,39 @@ public class SplashScreen extends Activity {
 	String nightTemperature;
 	String weekProgramState;
 	WeekProgram weekProgram;
+
+    AlertDialog connectionFailed;
  
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-       
+
+        this.connectionFailed = new AlertDialog.Builder(this, AlertDialog.THEME_HOLO_DARK).setMessage("Failed to connect to the thermostat server")
+                .setCancelable(true)
+                .setPositiveButton("Close App", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.cancel();
+                        Intent startMain = new Intent(Intent.ACTION_MAIN);
+                        startMain.addCategory(Intent.CATEGORY_HOME);
+                        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(startMain);
+                    }
+                })
+                .setNegativeButton("Retry", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.cancel();
+                        new PrefetchData().execute();
+                    }
+                })
+                .create();
+
         new PrefetchData().execute();
     }
     
@@ -40,18 +69,23 @@ public class SplashScreen extends Activity {
         }
  
         @Override
-        protected Void doInBackground(Void... arg0) {
-        	try{
+        protected Void doInBackground(Void... args) {
+            HeatingSystem.setActivity(SplashScreen.this);
+            try{
 				currentTemperature = HeatingSystem.get("currentTemperature");
 				dayTemperature = HeatingSystem.get("dayTemperature");
 				nightTemperature = HeatingSystem.get("nightTemperature");
 				weekProgramState = HeatingSystem.get("weekProgramState");
 				weekProgram = HeatingSystem.getWeekProgram();
 			} catch (ConnectException e) {
-				throw new RuntimeException("Connect exception!",e);
+				SplashScreen.this.connectionFailed.show();
+                this.cancel(true);
 			} catch (CorruptWeekProgramException e){
+                // Programmer's fault
 				throw new RuntimeException("Corrupt week program!", e);
-			}
+			} finally {
+                HeatingSystem.unsetActivity();
+            }
         	
         	return null;
         }

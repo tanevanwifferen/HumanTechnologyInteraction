@@ -14,6 +14,10 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import android.app.Activity;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -24,6 +28,17 @@ public class HeatingSystem {
 	public static String BASE_ADDRESS = "http://wwwis.win.tue.nl/2id40-ws/hoi";
 	public static String WEEK_PROGRAM_ADDRESS = BASE_ADDRESS + "/" + "weekProgram";
 	private final static int TIME_OUT = 10000; // in milliseconds.
+
+    // Needed for the connectivity check in get(String)
+    private static Context c;
+
+    public static void setActivity(Context c) {
+        HeatingSystem.c = c;
+    }
+
+    public static void unsetActivity() {
+        HeatingSystem.c = null;
+    }
 
 	/**
 	 * Retrieving weekProgram
@@ -174,6 +189,12 @@ public class HeatingSystem {
 		}
 
 		if (match) {
+            if(HeatingSystem.c != null) {
+                ConnectivityManager connectivityManager = (ConnectivityManager) HeatingSystem.c.getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+                if (activeNetworkInfo == null || !activeNetworkInfo.isConnected())
+                    throw new ConnectException();
+            }
 			InputStream in = null;
 			try {
 				System.out.println("USED Link: " + link);
@@ -316,7 +337,7 @@ public class HeatingSystem {
 	 * @throws InvalidInputValueException
 	 */
 	public static void put(String attribute_name, String value)
-			throws IllegalArgumentException, InvalidInputValueException {
+			throws IllegalArgumentException, InvalidInputValueException, ConnectException {
 		// Perform Dimension checks. En check if we get a http response status
 		// code of "OK".
 		// String[] xml_attribute_names
@@ -388,6 +409,12 @@ public class HeatingSystem {
 		// Output string.
 		String output = "<" + tag_name + ">" + value + "</" + tag_name + ">";
 
+        if(HeatingSystem.c != null) {
+            ConnectivityManager connectivityManager = (ConnectivityManager) HeatingSystem.c.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+            if (activeNetworkInfo == null || !activeNetworkInfo.isConnected())
+                throw new ConnectException();
+        }
 		DataOutputStream out = null;
 		try {
 			HttpURLConnection connect = getHttpConnection(link, "PUT");
@@ -402,9 +429,11 @@ public class HeatingSystem {
 			System.out.println("Http Response Code: " + responseCode);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (UnknownHostException e){
+            throw new ConnectException();
+        } catch (SocketTimeoutException e) {
+            throw new ConnectException();
+        } catch (IOException e) {
 			e.printStackTrace();
 		} finally {
 			if (out != null) {
@@ -421,43 +450,53 @@ public class HeatingSystem {
 	 * Uploading the updated or adjusted week program to the server
 	 * @param wpg
 	 */
-	public static void setWeekProgram(WeekProgram wpg) {
+	public static void setWeekProgram(WeekProgram wpg) throws ConnectException{
+        if(HeatingSystem.c != null) {
+            ConnectivityManager connectivityManager = (ConnectivityManager) HeatingSystem.c.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+            if (activeNetworkInfo == null || !activeNetworkInfo.isConnected())
+                throw new ConnectException();
+        }
 		DataOutputStream out = null;
 		try {
-			String xml_output = wpg.toXML();
-			System.out.println("Link: " + HeatingSystem.WEEK_PROGRAM_ADDRESS);
-			HttpURLConnection connect = getHttpConnection(
-					HeatingSystem.WEEK_PROGRAM_ADDRESS, "PUT");
+            String xml_output = wpg.toXML();
+            System.out.println("Link: " + HeatingSystem.WEEK_PROGRAM_ADDRESS);
+            HttpURLConnection connect = getHttpConnection(
+                    HeatingSystem.WEEK_PROGRAM_ADDRESS, "PUT");
 
-			out = new DataOutputStream(connect.getOutputStream()); 
-			out.writeBytes(xml_output);
-			out.flush();
+            out = new DataOutputStream(connect.getOutputStream());
+            out.writeBytes(xml_output);
+            out.flush();
 
-			// Check the response Code it may be the case that we retrieve an
-			// error, because the XML format is wrong.
-			String response = connect.getResponseMessage();
-			int responseCode = connect.getResponseCode();
-			System.out.println("Http Response: " + response);
+            // Check the response Code it may be the case that we retrieve an
+            // error, because the XML format is wrong.
+            String response = connect.getResponseMessage();
+            int responseCode = connect.getResponseCode();
+            System.out.println("Http Response: " + response);
 
-			System.out.println("Http Response Code: " + responseCode);
+            System.out.println("Http Response Code: " + responseCode);
 
-			if (responseCode != 200) {
-				InputStream err = connect.getErrorStream();
-				BufferedReader err_read = new BufferedReader(
-						new InputStreamReader(err));
-				String errInput;
-				while ((errInput = err_read.readLine()) != null) {
-					System.out.println("ErrorStream: " + errInput);
-				}
-				err.close(); // Close the Error Stream.
-				err_read.close();
-			}
-			// if(response.indexOf("STATUS=OK") == -1)
-			// throws WeekProgramUploadException(response);
+            if (responseCode != 200)
+            {
+                InputStream err = connect.getErrorStream();
+                BufferedReader err_read = new BufferedReader(
+                        new InputStreamReader(err));
+                String errInput;
+                while ((errInput = err_read.readLine()) != null)
+                {
+                    System.out.println("ErrorStream: " + errInput);
+                }
+                err.close(); // Close the Error Stream.
+                err_read.close();
+            }
+            // if(response.indexOf("STATUS=OK") == -1)
+            // throws WeekProgramUploadException(response);
+        } catch (SocketTimeoutException e) {
+            throw new ConnectException();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (NullPointerException e) { // Gets thrown by the toXML()
-											// function.
+                                           // function.
 			e.printStackTrace();
 		} finally {
 			try {
