@@ -25,7 +25,7 @@ import android.util.Xml;
 
 public class HeatingSystem {
 
-	public static String BASE_ADDRESS = "http://wwwis.win.tue.nl/2id40-ws/hoi";
+	public static String BASE_ADDRESS = "http://wwwis.win.tue.nl/2id40-ws/35";
 	public static String WEEK_PROGRAM_ADDRESS = BASE_ADDRESS + "/" + "weekProgram";
 	private final static int TIME_OUT = 10000; // in milliseconds.
 

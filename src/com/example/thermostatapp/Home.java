@@ -70,6 +70,7 @@ public class Home extends ActionBarActivity{
                         new PutWeekProgramState().execute();
                     }
                 })
+                .setCancelable(false)
                 .create();
 
         this.getConnectionFailed = new AlertDialog.Builder(this, AlertDialog.THEME_HOLO_DARK)
@@ -85,6 +86,7 @@ public class Home extends ActionBarActivity{
                         new GetTemperature().execute();
                     }
                 })
+                .setCancelable(false)
                 .create();
 
         this.getConnectionFailed2 = new AlertDialog.Builder(this, AlertDialog.THEME_HOLO_DARK)
@@ -100,6 +102,7 @@ public class Home extends ActionBarActivity{
                         new GetTemperature2().execute();
                     }
                 })
+                .setCancelable(false)
                 .create();
 
 		initializeVariables();

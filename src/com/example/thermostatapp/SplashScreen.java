@@ -48,6 +48,7 @@ public class SplashScreen extends Activity {
                         new PrefetchData().execute();
                     }
                 })
+                .setCancelable(false)
                 .create();
 
         new PrefetchData().execute();
