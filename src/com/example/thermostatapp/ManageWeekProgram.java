@@ -152,7 +152,7 @@ public class ManageWeekProgram extends ActionBarActivity{
             prefsEditor.putString("weekProgram", json);
             prefsEditor.commit();
 			
-            new SendWeekProgramToServer().execute();
+            new PutWeekProgram().execute();
 			
 		}
 	}
@@ -263,7 +263,7 @@ public class ManageWeekProgram extends ActionBarActivity{
                         prefsEditor.putString("weekProgram", json);
                         prefsEditor.commit();
 
-                        new SendWeekProgramToServer().execute();
+                        new PutWeekProgram().execute();
                     }
                 });
 
@@ -294,9 +294,6 @@ public class ManageWeekProgram extends ActionBarActivity{
 		    case R.id.action_settings:
 		    	break;
 		    case R.id.action_refresh:
-		    	//get new week program
-		    	
-		    	tableLayout.removeAllViews();
 		    	new GetWeekProgram().execute();
 		    default:
 		    	break;
@@ -316,7 +313,7 @@ public class ManageWeekProgram extends ActionBarActivity{
 	            String json = gson.toJson(weekProgram);
 	            prefsEditor.putString("weekProgram", json);
 	            prefsEditor.commit();
-				
+	   
 			} catch (CorruptWeekProgramException e) {
 				throw new RuntimeException("Corrupt week program!",e);
 			} catch (ConnectException e) {
@@ -328,6 +325,10 @@ public class ManageWeekProgram extends ActionBarActivity{
         @Override
         protected void onPostExecute(String result) {
         	progressDialog.dismiss();
+        	
+        	tableLayout.removeAllViews();
+        	int index = ManageWeekProgram.this.getActionBar().getSelectedNavigationIndex();
+            pager.setCurrentItem(index, true);
         }
 
         @Override
@@ -339,7 +340,7 @@ public class ManageWeekProgram extends ActionBarActivity{
         }
     }
 	
-	private class SendWeekProgramToServer extends AsyncTask<String, Void, String>{
+	private class PutWeekProgram extends AsyncTask<String, Void, String>{
 
 		@Override
 		protected String doInBackground(String... params) {
