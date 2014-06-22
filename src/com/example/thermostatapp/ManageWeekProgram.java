@@ -231,9 +231,7 @@ public class ManageWeekProgram extends ActionBarActivity{
         	View rootView = inflater.inflate(R.layout.fragment_base, container, false);
         	
         	tableLayout = (TableLayout) rootView.findViewById(R.id.day_tab);
-        	TextView textView = (TextView) rootView.findViewById(R.id.day_name);
-        	textView.setText(day);
-        	
+
         	tableLayout.removeAllViews();
         	fillTable();
     	    return rootView;
