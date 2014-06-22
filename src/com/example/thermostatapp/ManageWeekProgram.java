@@ -52,7 +52,7 @@ public class ManageWeekProgram extends ActionBarActivity{
     private WeekPagerAdapter adapter;
     private ViewPager pager;
     private TableLayout tableLayout;
-    private String day;
+    //private String day;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -102,15 +102,19 @@ public class ManageWeekProgram extends ActionBarActivity{
         }
 	}
 	
-	public void showTimePickerDialog(View v, int switchNumber) {
-	    DialogFragment newFragment = new TimePickerFragment(switchNumber);
+	public void showTimePickerDialog(View v, String day, int switchNumber) {
+	    DialogFragment newFragment = new TimePickerFragment(day, switchNumber);
 	    newFragment.show(getSupportFragmentManager(), "timePicker");
 	}
 	
 	private class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
-		private int switchNumber;
+
+        private final String day;
+
+        private final int switchNumber;
 		
-		private TimePickerFragment(int switchNumber){
+		private TimePickerFragment(String day, int switchNumber){
+            this.day = day;
 			this.switchNumber = switchNumber;
 		}
 		
@@ -221,7 +225,7 @@ public class ManageWeekProgram extends ActionBarActivity{
 
                     @Override
                     public void onClick(View view){
-                        showTimePickerDialog(view, switchNumber);
+                        showTimePickerDialog(view, day, switchNumber);
                     }
                 });
 
